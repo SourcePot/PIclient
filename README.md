@@ -1,6 +1,6 @@
 # PI Client
 This is a Raspberry Pi client providing communication with a Datapool web application.
-PI view is the corresponding web page within the Datapool web application. The webpage can receive requests from multiple PIs containing data and files.
+'PI view' (see the other repositories) is the corresponding web page within the Datapool web application. The webpage can receive requests from multiple PIs containing data and files.
 The web application answers to a request can be used to send data back to the corresponding PI.
 
 ## First steps
