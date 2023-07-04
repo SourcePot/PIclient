@@ -5,7 +5,7 @@ import pathlib
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'piRequest','mode':'idle','captureTime':10}
+sentinelStatus={'method':'piRequest','Content||mode':'idle','Content||captureTime':10,'Group':'Town','Folder':'Street and Buildiung','Name':'Location'}
 motionSensors={}
 leds={}
 strOutputs={}
@@ -25,10 +25,10 @@ if hasGpioZero:
 def initOutputs():
     global leds
     if hasGpioZero:
-        leds['alarm']=LED(17,initial_value=False)
-        leds['light']=LED(18,initial_value=False)
-        leds['motor']=LED(22,initial_value=False)
-        leds['direction']=LED(23,initial_value=False)
+        leds['Content||alarm']=LED(17,initial_value=False)
+        leds['Content||light']=LED(18,initial_value=False)
+        leds['Content||motor']=LED(22,initial_value=False)
+        leds['Content||direction']=LED(23,initial_value=False)
     strOutputs['console']='Client started'
     print(strOutputs['console'])
 initOutputs()
@@ -59,12 +59,12 @@ initInputs()
 def readInputs():
     global leds
     inputs={}
-    inputs['dateTime']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-    inputs['timeStamp']=int(time.time())
+    inputs['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+    inputs['Content||timeStamp']=int(time.time())
     for key,value in leds.items():
         inputs[key]=leds[key].is_active
     if hasGpioZero:
-        inputs['cpuTemperature']=CPUTemperature().temperature
+        inputs['Content||cpuTemperature']=CPUTemperature().temperature
     return inputs
 
 # ===================================== Behaviour =================================
