@@ -5,7 +5,7 @@ import pathlib
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'clientAccessTest','mode':'idle','captureTime':10}
+sentinelStatus={'method':'piRequest','mode':'idle','captureTime':10}
 motionSensors={}
 leds={}
 strOutputs={}

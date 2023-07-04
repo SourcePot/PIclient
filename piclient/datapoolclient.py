@@ -12,8 +12,8 @@ from datetime import datetime
 
 maxStackLength=10
 
-url='https://www.datapool.info/resource.php'
-#url='http://localhost/www-workspace/datapool/src/www/resource.php'
+#url='https://www.datapool.info/resource.php'
+url='http://localhost/www-workspace/datapool/src/www/resource.php'
 
 def jsonDecode(string):
     try:
