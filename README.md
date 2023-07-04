@@ -20,9 +20,9 @@ You need to adjust the client.json file in the newly created settings sub-direct
 These details must match the client registration within the Datapool web application.
 ![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
-## First steps on the side of Datapool webn application
-On the side of the Datapool web application you need to register the new client with one of the user accounts of the web application.
-The client will have the same privileges as a user of this account. Following figure shows the registration of the client, row 001:
+## First steps on the side of Datapool web application
+You need to register the new client with one of the user accounts of your web application. To do this go to 'Admin' &rarr; 'Account' an expand 'App credentials' (Lock symbol).
+Remember the registered client will have the same privileges as a user of this account. Following screenshot shows the registration of the client in row 001:
 ![Raspberry Pi client registration](/assets/img/datapool_client_registration.png "Client registration within the Datapool web application")
 
 
