@@ -193,11 +193,11 @@ def processStack():
             payload=payloadFile.read()
             try:
                 payload=json.loads(payload)
-                response=clientRequest(payload)
-                answer={'payload':payload,'response':response}
             except json.decoder.JSONDecodeError:
-                print('Paylod file json error: '+payload)
-                answer=response
+                print('Payload file json error: '+payload)
+                payload={}
+            response=clientRequest(payload)
+            answer={'payload':payload,'response':response}
         if (type(response) is not bool) and os.path.isfile(payloadFileName):
             os.remove(payloadFileName)
             if os.path.isfile(dataFileName):
