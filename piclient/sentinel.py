@@ -80,7 +80,7 @@ def capture(filename):
             
 def motionA():
     writeOutputs({'Content||light':1})
-    capture(str(int(time.time()))+'_motionA')
+    capture('motionA')
     writeOutputs({'Content||light':0})
     
 def motionB():
