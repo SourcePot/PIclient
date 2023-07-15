@@ -194,12 +194,13 @@ def processStack():
             except json.decoder.JSONDecodeError:
                 print('Payload file json error: '+payload)
                 payload:dict[str,str]={}
-            response=clientRequest(payload)
-            result=response
-        if (type(response) is not bool) and os.path.isfile(payloadFileName):
-            os.remove(payloadFileName)
-            if os.path.isfile(dataFileName):
-                os.remove(dataFileName)
+            result=clientRequest(payload)
+        if (type(result) is not bool):
+            response=result
+            if os.path.isfile(payloadFileName):
+                os.remove(payloadFileName)
+                if os.path.isfile(dataFileName):
+                    os.remove(dataFileName)
             addLog({'success':'Processing stack, client request success','stack size':len(items)})
         else:
             addLog({'error':'Processing stack, client request failed will try later','stack size':len(items)})
