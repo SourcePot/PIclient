@@ -62,7 +62,7 @@ def readInputs():
     inputs['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
     inputs['Content||timeStamp']=int(time.time())
     for key,value in leds.items():
-        inputs[key]=leds[key].is_active
+        inputs[key]=int(leds[key].is_active)
     if hasGpioZero:
         inputs['Content||cpuTemperature']=CPUTemperature().temperature
     return inputs
