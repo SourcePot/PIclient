@@ -77,6 +77,7 @@ def capture(filename):
                 for i in range(4)
                 ],
             use_video_port=True)
+            mediaItems2stack()
             
 def motionA():
     writeOutputs({'Content||light':1})
@@ -103,15 +104,12 @@ def getNextMediaItem():
         mediaItems=sorted(mediaItems)
         return dirs['media']+'/'+mediaItems.pop(0)
 
-def mediaItemPolling():
+def mediaItems2stack():
     global sentinelStatus
     mediaItem=getNextMediaItem()
-    if type(mediaItem) is not bool:
+    while type(mediaItem) is not bool:
         sentinelStatus=sentinelStatus|readInputs()
         datapoolclient.add2stack(sentinelStatus,mediaItem)
-    t=Timer(0.3,mediaItemPolling)
-    t.start()
-mediaItemPolling()
 
 def statusPolling():
     global sentinelStatus
