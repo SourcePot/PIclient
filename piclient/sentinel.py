@@ -88,7 +88,7 @@ def motionA():
         status=readInputs()
         writeOutputs({'Content||light':1})
         capture('motionA')
-        writeOutputs({'Content||light':busyCapturing['Content||light']})
+        writeOutputs({'Content||light':status['Content||light']})
     
 def motionB():
     pass
