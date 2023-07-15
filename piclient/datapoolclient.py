@@ -20,7 +20,7 @@ def jsonDecode(string):
         return True
     return json_obj
 
-dirs={}
+dirs:dict[str,str]={}
 def initDirs():
     global dirs
     dirs={'base':os.path.dirname(os.path.realpath(__file__))}
@@ -77,7 +77,6 @@ def getAccess():
 
 def requestNewAccessToken(access):
     payload={'grant_type':'authorization_code','client_app':access['client_app']}
-    resp={}
     try:
         # The datapool php-script might not be able to access the authorization header depending on the server settings of the datapool host
         """
@@ -92,7 +91,7 @@ def requestNewAccessToken(access):
         return False
     return jsonDecode(resp.text)
 
-def checkToken(token={}):
+def checkToken(token:dict[str,str]={}):
     initToken={'expires':0,'access_token':''}
     if type(token) is bool:
         return initToken
@@ -136,7 +135,7 @@ def getNextItem():
         itemsLength=len(items)
         return items.pop(0)
 
-def add2stack(payload={},attachmentFileName=''):
+def add2stack(payload:dict[str,str]={},attachmentFileName=''):
     global dirs
     global maxStackLength
     if itemsLength>maxStackLength:
@@ -177,7 +176,7 @@ def clientRequest(payload):
     return jsonDecode(resp.text)
 
 
-response={}
+response:dict[str,str]={}
 def processStack():
     global dirs,response
     nextItem=getNextItem()
@@ -194,7 +193,7 @@ def processStack():
                 payload=json.loads(payload)
             except json.decoder.JSONDecodeError:
                 print('Payload file json error: '+payload)
-                payload={}
+                payload:dict[str,str]={}
             response=clientRequest(payload)
             result=response
         if (type(response) is not bool) and os.path.isfile(payloadFileName):
