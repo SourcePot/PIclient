@@ -109,7 +109,8 @@ def mediaItemPolling():
     if type(mediaItem) is not bool:
         sentinelStatus=sentinelStatus|readInputs()
         datapoolclient.add2stack(sentinelStatus,mediaItem)
-    mediaItemPolling()
+    t=Timer(0.3,mediaItemPolling)
+    t.start()
 mediaItemPolling()
 
 def statusPolling():
