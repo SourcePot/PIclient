@@ -1,5 +1,4 @@
 import os
-import pathlib
 import shutil
 import codecs
 import time
@@ -7,7 +6,6 @@ import requests
 import json
 import base64
 from requests.auth import HTTPBasicAuth
-from threading import Timer
 from datetime import datetime
 
 maxStackLength=10
