@@ -15,7 +15,7 @@ print(dirs)
 
 hasPiCamera=pkgutil.find_loader('picamera')
 if hasPiCamera:
-    from picamera import PiCamera
+    import picamera
 
 hasGpioZero=pkgutil.find_loader('gpiozero')
 if hasGpioZero:
@@ -71,14 +71,17 @@ def readInputs():
 def capture():
     global dirs,leds
     if hasPiCamera:
-        filename=dirs['media']+'/capture.jpg'
-        with PiCamera() as camera:
+        with picamera.PiCamera() as camera:
                 leds['Content|[]|light'].on()
                 writeOutputs({'Content|[]|light':1})
+                camera.framerate=2
                 camera.start_preview()
                 time.sleep(1)
-                camera.capture(filename)
-                camera.stop_preview()
+                camera.capture_sequence([
+                    dirs['media']+'/capture%02d.jpg' % i
+                    for i in range(5)
+                    ],
+                use_video_port=True)
                 writeOutputs({'Content|[]|light':0})
 
 def motionA():
