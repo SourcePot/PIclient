@@ -85,9 +85,10 @@ def capture(filename):
 def motionA():
     global busyCapturing
     if (busyCapturing==False):
+        status=readInputs()
         writeOutputs({'Content||light':1})
         capture('motionA')
-        writeOutputs({'Content||light':0})
+        writeOutputs({'Content||light':busyCapturing['Content||light']})
     
 def motionB():
     pass
