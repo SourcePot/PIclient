@@ -110,8 +110,8 @@ def getAccessToken(access):
     else:
         addLog({'info':'No token file found, will be created'})
     if int(token['expires'])<time.time():
-        response=requestNewAccessToken(access)
-        token=checkToken(response)
+        tokenRequestResponse=requestNewAccessToken(access)
+        token=checkToken(tokenRequestResponse)
         with codecs.open(tokenFile,"w","utf-8") as f:
             json.dump(token,f)
             addLog({'info':'Tried to renew access token'})
@@ -211,12 +211,12 @@ def processStack():
 if __name__=="__main__":
     print('This script should be imported, not called directly. Calling it directly runs this testcase...')
    
-    payload={'method':'clientAccessTest','info':'For the client access test the token file will be send with the request'}
-    #payload['response']=clientRequest(payload,tokenFile)   
-    #payload['response']=add2stack(payload)
-    #payload['response']=add2stack(payload,__file__)
-    #payload['response']=add2stack(payload,tokenFile)
-    #print(payload)
+    testPayload={'method':'clientAccessTest','info':'For the client access test the token file will be send with the request'}
+    #testPayload['response']=clientRequest(testPayload,tokenFile)   
+    #testPayload['response']=add2stack(testPayload)
+    #testPayload['response']=add2stack(testPayload,__file__)
+    #testPayload['response']=add2stack(testPayload,tokenFile)
+    #print(testPayload)
     print(processStack())
 else:
     pass
