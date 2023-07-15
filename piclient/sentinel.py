@@ -1,7 +1,6 @@
 import datapoolclient
 import os
 import time
-import pathlib
 import pkgutil
 from threading import Timer
 
@@ -60,7 +59,7 @@ def readInputs():
     inputs={}
     inputs['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
     inputs['Content||timeStamp']=int(time.time())
-    for key in leds.items():
+    for key,value in leds.items():
         inputs[key]=int(leds[key].is_active)
     if hasGpioZero:
         inputs['Content||cpuTemperature']=CPUTemperature().temperature
@@ -81,7 +80,7 @@ def capture(filename):
             
 def motionA():
     writeOutputs({'Content||light':1})
-    capture(int(time.time())+'_motionA')
+    capture(str(int(time.time()))+'_motionA')
     writeOutputs({'Content||light':0})
     
 def motionB():
@@ -110,15 +109,14 @@ def mediaItemPolling():
     if type(mediaItem) is not bool:
         sentinelStatus=sentinelStatus|readInputs()
         datapoolclient.add2stack(sentinelStatus,mediaItem)
-    t=Timer(0.9,mediaItemPolling)
-    t.start()
+    mediaItemPolling()
 mediaItemPolling()
 
 def statusPolling():
     global sentinelStatus
     sentinelStatus=sentinelStatus|readInputs()
     datapoolclient.add2stack(sentinelStatus)
-    t=Timer(4.3,statusPolling)
+    t=Timer(4.7,statusPolling)
     t.start()
 statusPolling()
 
@@ -133,7 +131,7 @@ def stackProcessingLoop():
             # Server answer missing
             t=Timer(30.0,stackProcessingLoop)
     else:
-        # Normal stck processing
-        t=Timer(0.83,stackProcessingLoop)
+        # Normal stack processing
+        t=Timer(3.3,stackProcessingLoop)
     t.start()
 stackProcessingLoop()
