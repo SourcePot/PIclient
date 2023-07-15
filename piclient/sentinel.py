@@ -72,7 +72,7 @@ def capture():
     global dirs,leds
     if hasPiCamera:
         filename=dirs['media']+'/capture.jpg'
-        with picamera.PiCamera() as camera:
+        with PiCamera() as camera:
                 leds['Content|[]|light'].on()
                 writeOutputs({'Content|[]|light':1})
                 camera.start_preview()
