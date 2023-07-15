@@ -193,6 +193,7 @@ def processStack():
                 payload=json.loads(payloadStr)
             except json.decoder.JSONDecodeError:
                 print('Payload file json error: '+payloadStr)
+                addLog({'error':'Payload file json error, payload="'+payloadStr+'"'})
                 payload={}
             result=clientRequest(payload)
         if (type(result) is not bool):
