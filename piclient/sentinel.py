@@ -16,9 +16,7 @@ print(dirs)
 hasPiCamera=pkgutil.find_loader('picamera')
 if hasPiCamera:
     import picamera
-    with picamera.PiCamera(framerate=2) as camera:
-        camera.start_preview()
-        
+
 hasGpioZero=pkgutil.find_loader('gpiozero')
 if hasGpioZero:
     from gpiozero import MotionSensor,CPUTemperature,LED
@@ -74,6 +72,8 @@ def capture(filename):
     global dirs,leds
     if hasPiCamera:
         with picamera.PiCamera(framerate=2) as camera:
+                camera.start_preview()
+                time.sleep(2)
                 camera.capture_sequence([
                     dirs['media']+'/'+filename+'_%02d.jpg' % i
                     for i in range(5)
