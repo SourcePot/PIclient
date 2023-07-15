@@ -69,15 +69,15 @@ def readInputs():
 def capture(filename):
     global dirs,leds
     if hasPiCamera:
-        with picamera.PiCamera(framerate=1) as camera:
+        with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
-            time.sleep(1)
+            time.sleep(2)
             camera.capture_sequence([
                 dirs['media']+'/'+filename+'_%02d.jpg' % i
                 for i in range(4)
                 ],
             use_video_port=True)
-            mediaItems2stack()
+        mediaItems2stack()
             
 def motionA():
     writeOutputs({'Content||light':1})
@@ -94,22 +94,13 @@ if 'pirB' in motionSensors:
 
 
 # ==== add media item and/or status data to stack and process the stack ===========
-mediaItems=[]
-def getNextMediaItem():
-    global dirs,mediaItems
-    mediaItems=os.listdir(dirs['media'])
-    if not mediaItems:
-        return False
-    else:
-        mediaItems=sorted(mediaItems)
-        return dirs['media']+'/'+mediaItems.pop(0)
 
 def mediaItems2stack():
-    global sentinelStatus
-    mediaItem=getNextMediaItem()
-    while type(mediaItem) is not bool:
+    global dirs,sentinelStatus
+    for file in os.listdir(dirs['media']):
         sentinelStatus=sentinelStatus|readInputs()
-        datapoolclient.add2stack(sentinelStatus,mediaItem)
+        datapoolclient.add2stack(sentinelStatus,dirs['media']+'/'+file)
+        print(dirs['media']+'/'+file)
 
 def statusPolling():
     global sentinelStatus
