@@ -188,11 +188,11 @@ def processStack():
         payloadFileName=dirs['comstack']+'/'+nextItem
         dataFileName=payloadFileName.replace('payload.json','attachment.file')
         with open(payloadFileName,'r') as payloadFile:
-            payload=payloadFile.read()
+            payloadStr=payloadFile.read()
             try:
-                payload=json.loads(payload)
+                payload=json.loads(payloadStr)
             except json.decoder.JSONDecodeError:
-                print('Payload file json error: '+payload)
+                print('Payload file json error: '+payloadStr)
                 payload={}
             result=clientRequest(payload)
         if (type(result) is not bool):
