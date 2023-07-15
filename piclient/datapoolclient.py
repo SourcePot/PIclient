@@ -183,10 +183,10 @@ def processStack():
     global dirs,response
     nextItem=getNextItem()
     if type(nextItem) is bool:
-        answer=True
+        result=True
         addLog({'info':'Stack is empty'})
     else:    
-        answer=False
+        result=False
         payloadFileName=dirs['comstack']+'/'+nextItem
         dataFileName=payloadFileName.replace('payload.json','attachment.file')
         with open(payloadFileName,'r') as payloadFile:
@@ -197,7 +197,7 @@ def processStack():
                 print('Payload file json error: '+payload)
                 payload={}
             response=clientRequest(payload)
-            answer={'payload':payload,'response':response}
+            result=response
         if (type(response) is not bool) and os.path.isfile(payloadFileName):
             os.remove(payloadFileName)
             if os.path.isfile(dataFileName):
@@ -205,7 +205,7 @@ def processStack():
             addLog({'success':'Processing stack, client request success','stack size':len(items)})
         else:
             addLog({'error':'Processing stack, client request failed will try later','stack size':len(items)})
-    return answer
+    return result
 
 # If this file is directly called (not imported) clientRequest will be called to test the client access
 # Make sure you have the client registered within your Datapool web application and that you provide a method 

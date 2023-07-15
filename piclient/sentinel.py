@@ -11,7 +11,6 @@ leds={}
 strOutputs={}
 
 dirs=datapoolclient.getDirs()
-print(dirs)
 
 hasPiCamera=pkgutil.find_loader('picamera')
 if hasPiCamera:
@@ -21,7 +20,7 @@ hasGpioZero=pkgutil.find_loader('gpiozero')
 if hasGpioZero:
     from gpiozero import MotionSensor,CPUTemperature,LED
 
-# ===================================== Outputs ==================================
+# ===================================== Outputs ===================================
 def initOutputs():
     global leds
     if hasGpioZero:
@@ -61,7 +60,7 @@ def readInputs():
     inputs={}
     inputs['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
     inputs['Content||timeStamp']=int(time.time())
-    for key,value in leds.items():
+    for key in leds.items():
         inputs[key]=int(leds[key].is_active)
     if hasGpioZero:
         inputs['Content||cpuTemperature']=CPUTemperature().temperature
@@ -71,18 +70,18 @@ def readInputs():
 def capture(filename):
     global dirs,leds
     if hasPiCamera:
-        with picamera.PiCamera(framerate=2) as camera:
-                camera.start_preview()
-                time.sleep(2)
-                camera.capture_sequence([
-                    dirs['media']+'/'+filename+'_%02d.jpg' % i
-                    for i in range(5)
-                    ],
-                use_video_port=True)
+        with picamera.PiCamera(framerate=1) as camera:
+            camera.start_preview()
+            time.sleep(1)
+            camera.capture_sequence([
+                dirs['media']+'/'+filename+'_%02d.jpg' % i
+                for i in range(4)
+                ],
+            use_video_port=True)
             
 def motionA():
     writeOutputs({'Content||light':1})
-    capture('motionA')
+    capture(int(time.time())+'_motionA')
     writeOutputs({'Content||light':0})
     
 def motionB():
@@ -94,7 +93,7 @@ if 'pirB' in motionSensors:
     motionSensors['pirB'].when_motion=motionB
 
 
-# ============= Generic processing =========================================
+# ==== add media item and/or status data to stack and process the stack ===========
 mediaItems=[]
 def getNextMediaItem():
     global dirs,mediaItems
@@ -103,36 +102,38 @@ def getNextMediaItem():
         return False
     else:
         mediaItems=sorted(mediaItems)
-        return mediaItems.pop(0)
+        return dirs['media']+'/'+mediaItems.pop(0)
 
-seconds=0
-def polling():
-    global dirs,sentinelStatus,seconds
+def mediaItemPolling():
+    global sentinelStatus
     mediaItem=getNextMediaItem()
-    sentinelStatus=sentinelStatus|readInputs()
-    if type(mediaItem) is bool:
-        response=datapoolclient.add2stack(sentinelStatus)
-    else:
-        mediaItem=dirs['media']+'/'+mediaItem
-        response=datapoolclient.add2stack(sentinelStatus,mediaItem)
-    #print(datapoolclient.response)
-    #print(sentinelStatus)
-    writeOutputs(datapoolclient.response)
-    seconds+=1
-    t=Timer(1.0,polling)
+    if type(mediaItem) is not bool:
+        sentinelStatus=sentinelStatus|readInputs()
+        datapoolclient.add2stack(sentinelStatus,mediaItem)
+    t=Timer(0.9,mediaItemPolling)
     t.start()
-polling()
+mediaItemPolling()
+
+def statusPolling():
+    global sentinelStatus
+    sentinelStatus=sentinelStatus|readInputs()
+    datapoolclient.add2stack(sentinelStatus)
+    t=Timer(4.3,statusPolling)
+    t.start()
+statusPolling()
 
 def stackProcessingLoop():
-    global datapoolResponse
     answer=datapoolclient.processStack()
     if type(answer) is bool:
         if answer==True:
-            t=Timer(0.5,stackProcessingLoop)
+            # Stack is empty
+            t=Timer(0.3,stackProcessingLoop)
+            writeOutputs(datapoolclient.response)
         else:
-            t=Timer(10.0,stackProcessingLoop)
+            # Server answer missing
+            t=Timer(30.0,stackProcessingLoop)
     else:
-        datapoolResponse=answer['response']
-        t=Timer(0.5,stackProcessingLoop)
+        # Normal stck processing
+        t=Timer(0.83,stackProcessingLoop)
     t.start()
 stackProcessingLoop()
