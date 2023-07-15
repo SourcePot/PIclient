@@ -66,8 +66,10 @@ def readInputs():
     return inputs
 
 # ===================================== Behaviour =================================
+busyCapturing=False
 def capture(filename):
-    global dirs,leds
+    global dirs,leds,busyCapturing
+    busyCapturing=True
     if hasPiCamera:
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
@@ -78,11 +80,14 @@ def capture(filename):
                 ],
             use_video_port=True)
         mediaItems2stack()
-            
+    busyCapturing=False
+ 
 def motionA():
-    writeOutputs({'Content||light':1})
-    capture('motionA')
-    writeOutputs({'Content||light':0})
+    global busyCapturing
+    if (busyCapturing==False):
+        writeOutputs({'Content||light':1})
+        capture('motionA')
+        writeOutputs({'Content||light':0})
     
 def motionB():
     pass
@@ -100,8 +105,7 @@ def mediaItems2stack():
     for file in os.listdir(dirs['media']):
         sentinelStatus=sentinelStatus|readInputs()
         datapoolclient.add2stack(sentinelStatus,dirs['media']+'/'+file)
-        print(dirs['media']+'/'+file)
-
+    
 def statusPolling():
     global sentinelStatus
     sentinelStatus=sentinelStatus|readInputs()
@@ -115,7 +119,7 @@ def stackProcessingLoop():
     if type(answer) is bool:
         if answer==True:
             # Stack is empty
-            t=Timer(0.3,stackProcessingLoop)
+            t=Timer(1,stackProcessingLoop)
             writeOutputs(datapoolclient.response)
         else:
             # Server answer missing
