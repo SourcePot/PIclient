@@ -20,7 +20,9 @@ def jsonDecode(string):
         return True
     return json_obj
 
-def initDirs():    
+dirs={}
+def initDirs():
+    global dirs
     dirs={'base':os.path.dirname(os.path.realpath(__file__))}
     #dirs={'base':os.getcwd()}
     dirs['settings']=dirs['base']+'/settings'
@@ -35,9 +37,8 @@ def initDirs():
     dirs['media']=dirs['base']+'/media'
     if not os.path.isdir(dirs['media']):
         os.mkdir(dirs['media'],0o770)
-    return dirs;
+initDirs()
 
-dirs=initDirs()
 accessFile=dirs['settings']+'/client.json'
 tokenFile=dirs['settings']+'/token.json'
 
