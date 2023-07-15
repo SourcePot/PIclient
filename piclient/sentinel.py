@@ -71,15 +71,13 @@ def readInputs():
 def capture():
     global dirs,leds
     if hasPiCamera:
-        with picamera.PiCamera() as camera:
-                leds['Content|[]|light'].on()
+        with picamera.PiCamera(framerate=1) as camera:
                 writeOutputs({'Content|[]|light':1})
-                camera.framerate=2
                 camera.start_preview()
-                time.sleep(1)
+                time.sleep(2)
                 camera.capture_sequence([
                     dirs['media']+'/capture%02d.jpg' % i
-                    for i in range(5)
+                    for i in range(3)
                     ],
                 use_video_port=True)
                 writeOutputs({'Content|[]|light':0})
