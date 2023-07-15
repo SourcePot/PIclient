@@ -5,7 +5,7 @@ import pathlib
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'piRequest','Content|[]|mode':'idle','Content|[]|captureTime':10,'Group':'Town','Folder':'Street and Buildiung','Name':'Location'}
+sentinelStatus={'method':'piRequest','Content||mode':'idle','Content||captureTime':10,'Group':'Town','Folder':'Street and Buildiung','Name':'Location'}
 motionSensors={}
 leds={}
 strOutputs={}
@@ -25,10 +25,10 @@ if hasGpioZero:
 def initOutputs():
     global leds
     if hasGpioZero:
-        leds['Content|[]|alarm']=LED(17,initial_value=False)
-        leds['Content|[]|light']=LED(18,initial_value=False)
-        leds['Content|[]|motor']=LED(22,initial_value=False)
-        leds['Content|[]|direction']=LED(23,initial_value=False)
+        leds['Content||alarm']=LED(17,initial_value=False)
+        leds['Content||light']=LED(18,initial_value=False)
+        leds['Content||motor']=LED(22,initial_value=False)
+        leds['Content||direction']=LED(23,initial_value=False)
     strOutputs['console']='Client started'
     print(strOutputs['console'])
 initOutputs()
@@ -60,11 +60,11 @@ def readInputs():
     global leds
     inputs={}
     inputs['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-    inputs['Content|[]|timeStamp']=int(time.time())
+    inputs['Content||timeStamp']=int(time.time())
     for key,value in leds.items():
         inputs[key]=leds[key].is_active
     if hasGpioZero:
-        inputs['Content|[]|cpuTemperature']=CPUTemperature().temperature
+        inputs['Content||cpuTemperature']=CPUTemperature().temperature
     return inputs
 
 # ===================================== Behaviour =================================
@@ -75,15 +75,15 @@ def capture(filename):
                 camera.start_preview()
                 time.sleep(2)
                 camera.capture_sequence([
-                    dirs['media']+'/'+filename+'%02d.jpg' % i
+                    dirs['media']+'/'+filename+'_%02d.jpg' % i
                     for i in range(5)
                     ],
                 use_video_port=True)
             
 def motionA():
-    writeOutputs({'Content|[]|light':1})
+    writeOutputs({'Content||light':1})
     capture('motionA')
-    writeOutputs({'Content|[]|light':0})
+    writeOutputs({'Content||light':0})
     
 def motionB():
     pass
@@ -116,6 +116,7 @@ def polling():
         mediaItem=dirs['media']+'/'+mediaItem
         response=datapoolclient.add2stack(sentinelStatus,mediaItem)
     #print(datapoolclient.response)
+    #print(sentinelStatus)
     writeOutputs(datapoolclient.response)
     seconds+=1
     t=Timer(1.0,polling)
