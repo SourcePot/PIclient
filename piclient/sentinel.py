@@ -68,23 +68,22 @@ def readInputs():
     return inputs
 
 # ===================================== Behaviour =================================
-def capture():
+def capture(filename):
     global dirs,leds
     if hasPiCamera:
         with picamera.PiCamera(framerate=2) as camera:
-                leds['Content|[]|light'].on()
-                writeOutputs({'Content|[]|light':1})
                 camera.start_preview()
                 time.sleep(2)
                 camera.capture_sequence([
-                    dirs['media']+'/capture%02d.jpg' % i
+                    dirs['media']+'/'+filename+'%02d.jpg' % i
                     for i in range(5)
                     ],
                 use_video_port=True)
-                writeOutputs({'Content|[]|light':0})
-
+            
 def motionA():
-    capture()
+    writeOutputs({'Content|[]|light':1})
+    capture('motionA')
+    writeOutputs({'Content|[]|light':0})
     
 def motionB():
     pass
