@@ -45,7 +45,8 @@ def writeOutputs(response):
                 if key=='console':
                     print(value)
             if key in sentinelStatus:
-                sentinelStatus[key]=value
+                if (key=='Content||captureTime' or  key=='Content||mode'):
+                    sentinelStatus[key]=value
 
 # ===================================== Sensors ===================================
 def initInputs():
