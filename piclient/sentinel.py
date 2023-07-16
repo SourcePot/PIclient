@@ -108,12 +108,12 @@ def activityDetected(points):
     global activity,busyMeasuringActivity
     activity+=points
     if busyMeasuringActivity==False:
-        updateActivity()
+        busyMeasuringActivity=True
+        t=Timer(20,updateActivity)
+        t.start()
 
 def updateActivity():
     global sentinelStatus,busyMeasuringActivity,activity
-    busyMeasuringActivity=True
-    time.sleep(20)
     sentinelStatus['Content||activity']=activity
     activity=0
     busyMeasuringActivity=False
