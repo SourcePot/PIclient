@@ -69,18 +69,23 @@ def readInputs():
 
 # ===================================== Behaviour =================================
 busyCapturing=False
+def captureFileNames(filename):
+    global dirs
+    frame=0
+    timeStr=str(time.time())
+    timeStr=timeStr.replace('.','frac')
+    while frame<5:
+        yield dirs['media']+'/'+filename+'_'+timeStr+'.jpg'
+        frame+=1
+
 def capture(filename):
-    global dirs,leds,busyCapturing
+    global leds,busyCapturing
     busyCapturing=True
     if hasPiCamera:
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
             time.sleep(2)
-            camera.capture_sequence([
-                dirs['media']+'/'+filename+'_%02d.jpg' % i
-                for i in range(4)
-                ],
-            use_video_port=True)
+            camera.capture_sequence(captureFileNames(filename),use_video_port=True)
         mediaItems2stack()
     busyCapturing=False
  
