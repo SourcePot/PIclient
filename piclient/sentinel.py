@@ -4,7 +4,7 @@ import time
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':60,'Group':'Location','Folder':'Position','Name':'Pi entry'}
+sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':3600,'Group':'Location','Folder':'Position','Name':'Pi entry'}
 motionSensors={}
 leds={}
 strOutputs={}
@@ -156,6 +156,7 @@ def stackProcessingLoop():
             t=Timer(30.0,stackProcessingLoop)
     else:
         # Normal stack processing
+        writeOutputs(datapoolclient.response)
         t=Timer(3.3,stackProcessingLoop)
     t.start()
 stackProcessingLoop()
