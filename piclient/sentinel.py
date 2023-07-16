@@ -86,7 +86,7 @@ def capture(filename):
  
 def motionA():
     global busyCapturing,activity
-    updateActivity(10)
+    activityDetected(10)
     if (busyCapturing==False):
         status=readInputs()
         writeOutputs({'Content||light':1})
@@ -95,7 +95,7 @@ def motionA():
     
 def motionB():
     global busyCapturing,activity
-    updateActivity(1)
+    activityDetected(1)
     
 if 'pirA' in motionSensors:
     motionSensors['pirA'].when_motion=motionA
@@ -104,15 +104,19 @@ if 'pirB' in motionSensors:
 
 activity=0
 busyMeasuringActivity=False
-def updateActivity(points):
-    global sentinelStatus,busyMeasuringActivity,activity
-    activity=activity+points
+def activityDetected(points):
+    global activity,busyMeasuringActivity
+    activity+=points
     if busyMeasuringActivity==False:
-        busyMeasuringActivity=True
-        time.sleep(20)
-        sentinelStatus['Content||activity']=activity
-        activity=0
-        busyMeasuringActivity=False
+        updateActivity()
+
+def updateActivity():
+    global sentinelStatus,busyMeasuringActivity,activity
+    busyMeasuringActivity=True
+    time.sleep(20)
+    sentinelStatus['Content||activity']=activity
+    activity=0
+    busyMeasuringActivity=False
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
