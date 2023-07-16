@@ -92,7 +92,7 @@ def motionA():
     activityDetected(10)
     if (busyCapturing==False):
         startStatus=readInputs()
-        endStatus=startStatus()
+        endStatus=startStatus
         if sentinelStatus['Content||mode']!='idle':
             startStatus['Content||light']=1
         elif sentinelStatus['Content||mode']=='alarm':
