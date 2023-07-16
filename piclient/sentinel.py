@@ -73,8 +73,7 @@ def captureFileNames(filename):
     global dirs
     frame=0
     while frame<5:
-        time=int(time.time()+frame*0.5)
-        yield dirs['media']+'/'+filename+'_'+str(time)+'_'+frame+'.jpg'
+        yield dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_'+str(frame)+'.jpg'
         frame+=1
 
 def capture(filename):
