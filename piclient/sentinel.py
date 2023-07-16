@@ -4,7 +4,7 @@ import time
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':10,'Group':'Town','Folder':'Street and Buildiung','Name':'Location'}
+sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':10,'Group':'Location','Folder':'Position','Name':'Pi entry'}
 motionSensors={}
 leds={}
 strOutputs={}
@@ -105,7 +105,7 @@ def updateActivity():
     global sentinelStatus,activity
     sentinelStatus['Content||activity']=activity
     activity=0
-    t=Timer(5,updateActivity)
+    t=Timer(30,updateActivity)
     t.start()
 updateActivity()
 
