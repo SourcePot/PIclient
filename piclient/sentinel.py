@@ -160,7 +160,7 @@ def stackProcessingLoop():
     t.start()
 stackProcessingLoop()
 
-# ==== add media item and/or status data to stack and process the stack ===========
+# ==== periodic capturing =========================================================
 ticks=0
 def periodicCapture():
     global ticks,sentinelStatus,busyCapturing
