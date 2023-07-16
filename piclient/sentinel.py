@@ -113,7 +113,7 @@ def periodicCapture():
             if (busyCapturing==False):
                 capture('capture')
     ticks+=1
-    t=Timer(1,periodicCapture)
+    t=Timer(1.0,periodicCapture)
     t.start()
 
 activity=0
