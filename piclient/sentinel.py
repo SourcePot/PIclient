@@ -95,7 +95,7 @@ def motionA():
         endStatus=startStatus
         if sentinelStatus['Content||mode']!='idle':
             startStatus['Content||light']=1
-        elif sentinelStatus['Content||mode']=='alarm':
+        if sentinelStatus['Content||mode']=='alarm':
             startStatus['Content||alarm']=1
         writeOutputs({'Content||light':startStatus['Content||light'],'Content||alarm':startStatus['Content||alarm']})
         capture('motionA')
