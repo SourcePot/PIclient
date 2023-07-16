@@ -108,8 +108,9 @@ if 'pirB' in motionSensors:
 ticks=0
 def periodicCapture():
     global ticks,sentinelStatus,busyCapturing
-    if (sentinelStatus['Content||captureTime']!=0):
-        if (ticks%sentinelStatus['Content||captureTime']==0):
+    captureTime=int(sentinelStatus['Content||captureTime'])
+    if (captureTime!=0):
+        if (ticks % captureTime==0):
             if (busyCapturing==False):
                 capture('capture')
     ticks+=1
