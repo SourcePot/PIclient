@@ -77,9 +77,9 @@ def captureFileNames(filename):
 
 busyCapturing=False
 def capture(filename):
-    global busyCapturing
+    global busyCapturing,sentinelStatus
     busyCapturing=True
-    if hasPiCamera:
+    if hasPiCamera and sentinelStatus['Content||mode']!='idle':
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
             time.sleep(2)
@@ -88,13 +88,18 @@ def capture(filename):
     busyCapturing=False
  
 def motionA():
-    global busyCapturing,activity
+    global busyCapturing,activity,sentinelStatus
     activityDetected(10)
     if (busyCapturing==False):
-        status=readInputs()
-        writeOutputs({'Content||light':1})
+        startStatus=readInputs()
+        endStatus=startStatus()
+        if sentinelStatus['Content||mode']!='idle':
+            startStatus['Content||light']=1
+        elif sentinelStatus['Content||mode']=='alarm':
+            startStatus['Content||alarm']=1
+        writeOutputs({'Content||light':startStatus['Content||light'],'Content||alarm':startStatus['Content||alarm']})
         capture('motionA')
-        writeOutputs({'Content||light':status['Content||light']})
+        writeOutputs({'Content||light':endStatus['Content||light'],'Content||alarm':endStatus['Content||alarm']})
     
 def motionB():
     global busyCapturing,activity
