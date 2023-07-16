@@ -45,6 +45,7 @@ def writeOutputs(response):
                 if key=='console':
                     print(value)
             if key in sentinelStatus:
+                # use a key-whitelist for status which should be updated by the server response
                 if (key=='Content||captureTime' or  key=='Content||mode'):
                     sentinelStatus[key]=value
 
