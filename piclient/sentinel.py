@@ -4,7 +4,7 @@ import time
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'piRequest','Content||mode':'idle','Content||captureTime':10,'Group':'Town','Folder':'Street and Buildiung','Name':'Location'}
+sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':10,'Group':'Town','Folder':'Street and Buildiung','Name':'Location'}
 motionSensors={}
 leds={}
 strOutputs={}
@@ -83,7 +83,8 @@ def capture(filename):
     busyCapturing=False
  
 def motionA():
-    global busyCapturing
+    global busyCapturing,sentinelStatus
+    sentinelStatus['Content||activity']=sentinelStatus['Content||activity']+10
     if (busyCapturing==False):
         status=readInputs()
         writeOutputs({'Content||light':1})
@@ -91,7 +92,9 @@ def motionA():
         writeOutputs({'Content||light':status['Content||light']})
     
 def motionB():
-    pass
+    global busyCapturing,sentinelStatus
+    sentinelStatus['Content||activity']=sentinelStatus['Content||activity']+1
+    
 
 if 'pirA' in motionSensors:
     motionSensors['pirA'].when_motion=motionA
@@ -113,6 +116,7 @@ def statusPolling():
     sentinelStatus=sentinelStatus|readInputs()
     sentinelStatus['Type']='piStatus'
     datapoolclient.add2stack(sentinelStatus)
+    sentinelStatus['Content||activity']=0
     t=Timer(4.7,statusPolling)
     t.start()
 statusPolling()
