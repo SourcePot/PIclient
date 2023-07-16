@@ -125,6 +125,7 @@ def mediaItems2stack():
     for file in os.listdir(dirs['media']):
         sentinelStatus=sentinelStatus|readInputs()
         sentinelStatus['Type']='piMedia'
+        sentinelStatus['Name']=file
         datapoolclient.add2stack(sentinelStatus,dirs['media']+'/'+file)
     
 def statusPolling():
