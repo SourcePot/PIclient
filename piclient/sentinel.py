@@ -60,7 +60,7 @@ def readInputs():
     global leds
     inputs={}
     inputs['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-    inputs['Content||timeStamp']=int(time.time())
+    inputs['Content||timestamp']=int(time.time())
     for key,value in leds.items():
         inputs[key]=int(leds[key].is_active)
     if hasGpioZero:
