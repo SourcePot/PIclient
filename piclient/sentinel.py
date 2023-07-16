@@ -72,10 +72,9 @@ busyCapturing=False
 def captureFileNames(filename):
     global dirs
     frame=0
-    timeStr=str(time.time())
-    timeStr=timeStr.replace('.','frac')
     while frame<5:
-        yield dirs['media']+'/'+filename+'_'+timeStr+'.jpg'
+        time=int(time.time()+frame*0.5)
+        yield dirs['media']+'/'+filename+'_'+str(time)+'_'+frame+'.jpg'
         frame+=1
 
 def capture(filename):
@@ -131,6 +130,9 @@ def mediaItems2stack():
         sentinelStatus=sentinelStatus|readInputs()
         sentinelStatus['Type']='piMedia'
         sentinelStatus['Name']=file
+        fileNameComps=file.split('_')
+        if (len(fileNameComps)==3):
+            sentinelStatus['Content||timestamp']=fileNameComps[1]
         datapoolclient.add2stack(sentinelStatus,dirs['media']+'/'+file)
     
 def statusPolling():
