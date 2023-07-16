@@ -4,7 +4,7 @@ import time
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':10,'Group':'Location','Folder':'Position','Name':'Pi entry'}
+sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':60,'Group':'Location','Folder':'Position','Name':'Pi entry'}
 motionSensors={}
 leds={}
 strOutputs={}
@@ -68,7 +68,6 @@ def readInputs():
     return inputs
 
 # ===================================== Behaviour =================================
-busyCapturing=False
 def captureFileNames(filename):
     global dirs
     frame=0
@@ -76,8 +75,9 @@ def captureFileNames(filename):
         yield dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_'+str(frame)+'.jpg'
         frame+=1
 
+busyCapturing=False
 def capture(filename):
-    global leds,busyCapturing
+    global busyCapturing
     busyCapturing=True
     if hasPiCamera:
         with picamera.PiCamera(framerate=2) as camera:
@@ -104,6 +104,17 @@ if 'pirA' in motionSensors:
     motionSensors['pirA'].when_motion=motionA
 if 'pirB' in motionSensors:
     motionSensors['pirB'].when_motion=motionB
+
+ticks=0
+def periodicCapture():
+    global ticks,sentinelStatus,busyCapturing
+    if (sentinelStatus['Content||captureTime']!=0):
+        if (ticks%sentinelStatus['Content||captureTime']==0):
+            if (busyCapturing==False):
+                capture('capture')
+    ticks+=1
+    t=Timer(periodicCapture)
+    t.start()
 
 activity=0
 busyMeasuringActivity=False
