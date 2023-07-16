@@ -105,18 +105,6 @@ if 'pirA' in motionSensors:
 if 'pirB' in motionSensors:
     motionSensors['pirB'].when_motion=motionB
 
-ticks=0
-def periodicCapture():
-    global ticks,sentinelStatus,busyCapturing
-    captureTime=int(sentinelStatus['Content||captureTime'])
-    if (captureTime!=0):
-        if (ticks % captureTime==0):
-            if (busyCapturing==False):
-                capture('capture')
-    ticks+=1
-    t=Timer(1.0,periodicCapture)
-    t.start()
-
 activity=0
 busyMeasuringActivity=False
 def activityDetected(points):
@@ -171,3 +159,17 @@ def stackProcessingLoop():
         t=Timer(3.3,stackProcessingLoop)
     t.start()
 stackProcessingLoop()
+
+# ==== add media item and/or status data to stack and process the stack ===========
+ticks=0
+def periodicCapture():
+    global ticks,sentinelStatus,busyCapturing
+    captureTime=int(sentinelStatus['Content||captureTime'])
+    if (captureTime!=0):
+        if (ticks % captureTime==0):
+            if (busyCapturing==False):
+                capture('capture')
+    ticks+=1
+    t=Timer(1.0,periodicCapture)
+    t.start()
+periodicCapture()
