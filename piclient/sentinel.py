@@ -8,7 +8,6 @@ sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle
 motionSensors={}
 leds={}
 strOutputs={}
-activity=0
 
 dirs=datapoolclient.getDirs()
 
@@ -87,7 +86,7 @@ def capture(filename):
  
 def motionA():
     global busyCapturing,activity
-    activity=activity+10
+    updateActivity(10)
     if (busyCapturing==False):
         status=readInputs()
         writeOutputs({'Content||light':1})
@@ -96,20 +95,24 @@ def motionA():
     
 def motionB():
     global busyCapturing,activity
-    activity=activity+1
-
+    updateActivity(1)
+    
 if 'pirA' in motionSensors:
     motionSensors['pirA'].when_motion=motionA
 if 'pirB' in motionSensors:
     motionSensors['pirB'].when_motion=motionB
 
-def updateActivity():
-    global sentinelStatus,activity
-    sentinelStatus['Content||activity']=activity
-    activity=0
-    t=Timer(30,updateActivity)
-    t.start()
-updateActivity()
+activity=0
+busyMeasuringActivity=False
+def updateActivity(points):
+    global sentinelStatus,busyMeasuringActivity,activity
+    activity=activity+points
+    if busyMeasuringActivity==False:
+        busyMeasuringActivity=True
+        time.sleep(20)
+        sentinelStatus['Content||activity']=activity
+        activity=0
+        busyMeasuringActivity=False
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
