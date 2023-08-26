@@ -85,7 +85,7 @@ def capture(filename):
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
             time.sleep(1)
-            camera.capture_sequence(captureFileNames(filename),use_video_port=True)
+            camera.capture_sequence(captureFileNames(filename),use_video_port=False,resize=None)
         mediaItems2stack()
     busyCapturing=False
  
