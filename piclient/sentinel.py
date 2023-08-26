@@ -156,7 +156,7 @@ def stackProcessingLoop():
     else:
         # Normal stack processing
         writeOutputs(datapoolclient.response)
-        t=Timer(3.3,stackProcessingLoop)
+        t=Timer(1.9,stackProcessingLoop)
     t.start()
 stackProcessingLoop()
 
