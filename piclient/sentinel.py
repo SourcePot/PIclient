@@ -68,6 +68,8 @@ def readInputs():
     return inputs
 
 # ===================================== Behaviour =================================
+activity=0
+
 def captureFileNames(filename):
     global dirs
     frame=0
@@ -82,14 +84,13 @@ def capture(filename):
     if hasPiCamera and sentinelStatus['Content||mode']!='idle':
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
-            time.sleep(2)
             camera.capture_sequence(captureFileNames(filename),use_video_port=True)
         mediaItems2stack()
     busyCapturing=False
  
 def motionA():
     global busyCapturing,activity,sentinelStatus
-    activityDetected(10)
+    activity+=10
     if (busyCapturing==False):
         startStatus=readInputs()
         endStatus=startStatus
@@ -103,28 +104,21 @@ def motionA():
     
 def motionB():
     global busyCapturing,activity
-    activityDetected(1)
+    activity+=5
     
 if 'pirA' in motionSensors:
     motionSensors['pirA'].when_motion=motionA
 if 'pirB' in motionSensors:
     motionSensors['pirB'].when_motion=motionB
 
-activity=0
-busyMeasuringActivity=False
-def activityDetected(points):
-    global activity,busyMeasuringActivity
-    activity+=points
-    if busyMeasuringActivity==False:
-        busyMeasuringActivity=True
-        t=Timer(20,updateActivity)
-        t.start()
-
 def updateActivity():
-    global sentinelStatus,busyMeasuringActivity,activity
+    global sentinelStatus,activity
     sentinelStatus['Content||activity']=activity
-    activity=0
-    busyMeasuringActivity=False
+    if (activity>0):
+        activity-=1
+    t=Timer(10,updateActivity)
+    t.start()
+updateActivity()
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
@@ -144,7 +138,6 @@ def statusPolling():
     sentinelStatus=sentinelStatus|readInputs()
     sentinelStatus['Type']='piStatus'
     datapoolclient.add2stack(sentinelStatus)
-    sentinelStatus['Content||activity']=0
     t=Timer(4.7,statusPolling)
     t.start()
 statusPolling()
