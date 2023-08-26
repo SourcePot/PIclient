@@ -73,7 +73,7 @@ activity=0
 def captureFileNames(filename):
     global dirs
     frame=0
-    while frame<3:
+    while frame<4:
         yield dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_'+str(frame)+'.jpg'
         frame+=1
 
@@ -84,13 +84,14 @@ def capture(filename):
     if hasPiCamera and sentinelStatus['Content||mode']!='idle':
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
+            time.sleep(1)
             camera.capture_sequence(captureFileNames(filename),use_video_port=True)
         mediaItems2stack()
     busyCapturing=False
  
 def motionA():
     global busyCapturing,activity,sentinelStatus
-    activity+=10
+    activity+=4
     if (busyCapturing==False):
         startStatus=readInputs()
         endStatus=startStatus
@@ -104,7 +105,7 @@ def motionA():
     
 def motionB():
     global busyCapturing,activity
-    activity+=5
+    activity+=1
     
 if 'pirA' in motionSensors:
     motionSensors['pirA'].when_motion=motionA
@@ -116,7 +117,7 @@ def updateActivity():
     sentinelStatus['Content||activity']=activity
     if (activity>0):
         activity-=1
-    t=Timer(10,updateActivity)
+    t=Timer(6,updateActivity)
     t.start()
 updateActivity()
 
