@@ -138,6 +138,7 @@ def statusPolling():
     global sentinelStatus
     sentinelStatus=sentinelStatus|readInputs()
     sentinelStatus['Type']='piStatus'
+    sentinelStatus['Name']='Status'
     datapoolclient.add2stack(sentinelStatus)
     t=Timer(4.7,statusPolling)
     t.start()
