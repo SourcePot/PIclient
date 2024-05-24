@@ -1,10 +1,9 @@
 # PI Client
-This is a Raspberry Pi client providing communication with a Datapool web application.
-'PI view' (see other SourcePot repositories) is the corresponding web page (App) within the Datapool web application. 
+The Python code of this respository is for a Raspberry Pi. It enables the Raspberry Pi to connect to the Datapool web application.
+Refer to the 'PI view' respository which is the corresponding web page (App) within the Datapool web application. 
 
-'PI view' can receive requests from multiple PIs containing data and/or files.
-The web application's answer to a request contains the return data for the corresponding PI.
-This means each communicating  PI keeps the connection alive.
+'PI view' receives requests from multiple Raspberry Pis containing data and/or files.
+The web application's answer to a request contains the return data for the corresponding Raspberry Pi.
 
 ## First steps on the side of the Raspberry Pi
 To setup the Raspberry Pi client you need to create a folder on your PI and copy the following three python files into this folder: 
