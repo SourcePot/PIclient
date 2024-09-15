@@ -4,7 +4,87 @@ import time
 import pkgutil
 from threading import Timer
 
-sentinelStatus={'method':'piRequest','Content||activity':0,'Content||mode':'idle','Content||captureTime':3600,'Group':'Location','Folder':'Position','Name':'Pi entry'}
+entry={'Group':'Town','Folder':'Address','Name':'Location'}
+# settings
+entry['Content||Settings||captureTime||@function']='select'
+entry['Content||Settings||captureTime||@value']=3600
+entry['Content||Settings||captureTime||@excontainer']=True
+entry['Content||Settings||captureTime||@options||10']=10
+entry['Content||Settings||captureTime||@options||60']=60
+entry['Content||Settings||captureTime||@options||600']=600
+entry['Content||Settings||captureTime||@options||3600']=3600
+
+entry['Content||Settings||mode||@function']='select'
+entry['Content||Settings||mode||@value']='alarm'
+entry['Content||Settings||mode||@excontainer']=True
+entry['Content||Settings||mode||@options||idle']='Idle'
+entry['Content||Settings||mode||@options||sms']='SMS'
+entry['Content||Settings||mode||@options||alarm']='Alarm'
+
+entry['Content||Settings||light||@function']='select'
+entry['Content||Settings||light||@value']=0
+entry['Content||Settings||light||@excontainer']=True
+entry['Content||Settings||light||@options||0']='Off'
+entry['Content||Settings||light||@options||1']='On'
+
+entry['Content||Settings||alarm||@function']='select'
+entry['Content||Settings||alarm||@value']=0
+entry['Content||Settings||alarm||@excontainer']=True
+entry['Content||Settings||alarm||@options||0']='Off'
+entry['Content||Settings||alarm||@options||1']='On'
+
+entry['Content||Settings||A||@function']='select'
+entry['Content||Settings||A||@value']=0
+entry['Content||Settings||A||@excontainer']=True
+entry['Content||Settings||A||@options||0']='Off'
+entry['Content||Settings||A||@options||1']='On'
+
+entry['Content||Settings||B||@function']='select'
+entry['Content||Settings||B||@value']=0
+entry['Content||Settings||B||@excontainer']=True
+entry['Content||Settings||B||@options||0']='Off'
+entry['Content||Settings||B||@options||1']='On'
+# status
+entry['Content||Status||timestamp||@tag']='p'
+entry['Content||Status||timestamp||@value']:0
+entry['Content||Status||captureTime||@tag']='p'
+entry['Content||Status||captureTime||@value']:3600
+entry['Content||Status||mode||@tag']='p'
+entry['Content||Status||mode||@value']:'idle'
+entry['Content||Status||cpuTemperature||@tag']='p'
+entry['Content||Status||cpuTemperature||@value']=0
+entry['Content||Status||activity||@tag']='meter'
+entry['Content||Status||activity||@min']=0
+entry['Content||Status||activity||@max']=20
+entry['Content||Status||activity||@low']=0
+entry['Content||Status||activity||@high']=3
+entry['Content||Status||activity||@value']=0
+
+entry['Content||Status||light||@tag']='meter'
+entry['Content||Status||light||@min']=0
+entry['Content||Status||light||@max']=1
+entry['Content||Status||light||@value']=0
+
+entry['Content||Status||alarm||@tag']='meter'
+entry['Content||Status||alarm||@min']=0
+entry['Content||Status||alarm||@max']=1
+entry['Content||Status||alarm||@high']=1
+entry['Content||Status||alarm||@value']=0
+
+entry['Content||Status||A||@tag']='meter'
+entry['Content||Status||A||@min']=0
+entry['Content||Status||A||@max']=1
+entry['Content||Status||A||@value']=0
+
+entry['Content||Status||B||@tag']='meter'
+entry['Content||Status||B||@min']=0
+entry['Content||Status||B||@max']=1
+entry['Content||Status||B||@value']=0
+# file
+entry['Params||File||Name']=''
+entry['Params||File||Extension']=''
+entry['Params||File||MIME-Type']=''
+
 motionSensors={}
 leds={}
 strOutputs={}
@@ -23,30 +103,31 @@ if hasGpioZero:
 def initOutputs():
     global leds
     if hasGpioZero:
-        leds['Content||alarm']=LED(17,initial_value=False)
-        leds['Content||light']=LED(18,initial_value=False)
-        leds['Content||motor']=LED(22,initial_value=False)
-        leds['Content||direction']=LED(23,initial_value=False)
-    strOutputs['console']='Client started'
-    print(strOutputs['console'])
+        leds['Content||Settings||alarm||@value']=LED(17,initial_value=False)
+        leds['Content||Settings||light||@value']=LED(18,initial_value=False)
+        leds['Content||Settings||A||@value']=LED(22,initial_value=False)
+        leds['Content||Settings||B||@value']=LED(23,initial_value=False)
+    print('Client started')
 initOutputs()
 
+# process repsponse
 def writeOutputs(response):
-    global leds,strOutputs,sentinelStatus
+    global leds,strOutputs,entry
     if type(response) is not bool:
         for key,value in response.items():
+            key=key+'||@value'
             if key in leds:
                 if (int(value)>0):
                     leds[key].on()
+                    entry[key]=1
                 else:
                     leds[key].off()
+                    entry[key]=0
             if key in strOutputs:
                 if key=='console':
                     print(value)
-            if key in sentinelStatus:
-                # use a key-whitelist for status which should be updated by the server response
-                if (key=='Content||captureTime' or  key=='Content||mode'):
-                    sentinelStatus[key]=value
+            if key in entry:
+                entry[key]=value
 
 # ===================================== Sensors ===================================
 def initInputs():
@@ -57,15 +138,17 @@ def initInputs():
 initInputs()        
 
 def readInputs():
-    global leds
-    inputs={}
-    inputs['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-    inputs['Content||timestamp']=int(time.time())
+    global leds,entry,activity
+    entry['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+    entry['Content||Status||timestamp||@value']=int(time.time())
+    entry['Content||Status||activity||@value']=activity
+    entry['Content||Status||mode||@value']=entry['Content||Settings||mode||@value']
+    entry['Content||Status||captureTime||@value']=entry['Content||Settings||captureTime||@value']
     for key,value in leds.items():
-        inputs[key]=int(leds[key].is_active)
+        entryKey=key.replace('Settings','Status')
+        entry[entryKey]=int(leds[key].is_active)
     if hasGpioZero:
-        inputs['Content||cpuTemperature']=CPUTemperature().temperature
-    return inputs
+        entry['Content||Status||cpuTemperature||@value']=CPUTemperature().temperature
 
 # ===================================== Behaviour =================================
 activity=0
@@ -79,9 +162,9 @@ def captureFileNames(filename):
 
 busyCapturing=False
 def capture(filename):
-    global busyCapturing,sentinelStatus
+    global busyCapturing,entry
     busyCapturing=True
-    if hasPiCamera and sentinelStatus['Content||mode']!='idle':
+    if hasPiCamera and entry['Content||Settings||mode||@value']!='idle':
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
             time.sleep(1)
@@ -90,18 +173,24 @@ def capture(filename):
     busyCapturing=False
  
 def motionA():
-    global busyCapturing,activity,sentinelStatus
+    global busyCapturing,activity,entry
     activity+=4
     if (busyCapturing==False):
-        startStatus=readInputs()
-        endStatus=startStatus
-        if sentinelStatus['Content||mode']!='idle':
-            startStatus['Content||light']=1
-        if sentinelStatus['Content||mode']=='alarm':
-            startStatus['Content||alarm']=1
-        writeOutputs({'Content||light':startStatus['Content||light'],'Content||alarm':startStatus['Content||alarm']})
+        if entry['Content||Settings||mode||@value']!='idle':
+            leds['Content||Settings||light||@value'].on()
+        if entry['Content||Settings||mode||@value']=='alarm':
+            leds['Content||Settings||alarm||@value'].on()
+        entry['Content||Status||light||@value']=leds['Content||Settings||light||@value'].is_active
+        entry['Content||Status||alarm||@value']=leds['Content||Settings||alarm||@value'].is_active
         capture('motionA')
-        writeOutputs({'Content||light':endStatus['Content||light'],'Content||alarm':endStatus['Content||alarm']})
+        if (int(entry['Content||Settings||light||@value'])==1):
+            leds['Content||Settings||light||@value'].on()
+        else:
+            leds['Content||Settings||light||@value'].off()
+        if (int(entry['Content||Settings||alarm||@value'])==1):
+            leds['Content||Settings||alarm||@value'].on()
+        else:
+            leds['Content||Settings||alarm||@value'].off()
     
 def motionB():
     global busyCapturing,activity
@@ -113,8 +202,7 @@ if 'pirB' in motionSensors:
     motionSensors['pirB'].when_motion=motionB
 
 def updateActivity():
-    global sentinelStatus,activity
-    sentinelStatus['Content||activity']=activity
+    global entry,activity
     if (activity>0):
         activity-=1
     t=Timer(6,updateActivity)
@@ -124,28 +212,34 @@ updateActivity()
 # ==== add media item and/or status data to stack and process the stack ===========
 
 def mediaItems2stack():
-    global dirs,sentinelStatus
+    global dirs,entry
     for file in os.listdir(dirs['media']):
-        sentinelStatus=sentinelStatus|readInputs()
-        sentinelStatus['Type']='piMedia'
-        sentinelStatus['Name']=file
+        readInputs()
+        entry['Tag']='media'
         fileNameComps=file.split('_')
         if (len(fileNameComps)==3):
-            sentinelStatus['Content||timestamp']=fileNameComps[1]
-        datapoolclient.add2stack(sentinelStatus,dirs['media']+'/'+file)
+            entry['Content||Status||timestamp||@value']=fileNameComps[1]
+            entry['Params||File||Name']=file
+            entry['Params||File||Extension']='jpeg'
+            entry['Params||File||MIME-Type']='image/jpeg'
+        else:
+            entry['Params||File||Name']=''
+            entry['Params||File||Extension']=''
+            entry['Params||File||MIME-Type']=''
+        datapoolclient.add2stack(entry,dirs['media']+'/'+file)
     
 def statusPolling():
-    global sentinelStatus
-    sentinelStatus=sentinelStatus|readInputs()
-    sentinelStatus['Type']='piStatus'
-    sentinelStatus['Name']='Status'
-    datapoolclient.add2stack(sentinelStatus)
+    global entry
+    readInputs()
+    entry['Tag']='status'
+    datapoolclient.add2stack(entry)
     t=Timer(4.7,statusPolling)
     t.start()
 statusPolling()
 
 def stackProcessingLoop():
     answer=datapoolclient.processStack()
+    #print(datapoolclient.response)
     if type(answer) is bool:
         if answer==True:
             # Stack is empty
@@ -164,8 +258,8 @@ stackProcessingLoop()
 # ==== periodic capturing =========================================================
 ticks=0
 def periodicCapture():
-    global ticks,sentinelStatus,busyCapturing
-    captureTime=int(sentinelStatus['Content||captureTime'])
+    global ticks,entry,busyCapturing
+    captureTime=int(entry['Content||Settings||captureTime||@value'])
     if (captureTime!=0):
         if (ticks % captureTime==0):
             if (busyCapturing==False):

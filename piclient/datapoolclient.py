@@ -65,7 +65,7 @@ def addLog(log={'Info':'Test log entry'}):
 def getAccess():
     global url
     global accessFile
-    access={'client_app':'datapool-client','client_id':'pi','client_secret':'****','url':url}
+    access={'client_id':'pi','client_secret':'****','url':url}
     if os.path.isfile(accessFile):
         with open(accessFile) as f:
             fileContent=f.read()
@@ -76,7 +76,7 @@ def getAccess():
     return access
 
 def requestNewAccessToken(access):
-    payload={'grant_type':'authorization_code','client_app':access['client_app']}
+    payload={'grant_type':'authorization_code'}
     try:
         # The datapool php-script might not be able to access the authorization header depending on the server settings of the datapool host
         """
@@ -109,7 +109,8 @@ def getAccessToken(access):
             token=checkToken(json.loads(fileContent))
     else:
         addLog({'info':'No token file found, will be created'})
-    if int(token['expires'])<time.time():
+    expires=int(token['expires'])-int(time.time())-10
+    if expires<0:
         tokenRequestResponse=requestNewAccessToken(access)
         token=checkToken(tokenRequestResponse)
         with codecs.open(tokenFile,"w","utf-8") as f:
@@ -196,6 +197,8 @@ def processStack():
                 addLog({'error':'Payload file json error, payload="'+payloadStr+'"'})
                 payload={}
             result=clientRequest(payload)
+            #print(result['token_expires_in_sec'])
+            #print(result['error'])
         if (type(result) is not bool):
             response=result
             if os.path.isfile(payloadFileName):
