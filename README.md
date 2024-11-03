@@ -25,7 +25,7 @@ Remember the registered client will have the same privileges as a user of this a
 ![Raspberry Pi client registration](/assets/img/datapool_client_registration.png "Client registration within the Datapool web application")
 
 ## Example
-The RemoteClient processor provides a user interface which is defined by the remote client. Within `sentinel.py` the python dictionary `entry` key `Content||Settings||...` defines the control elements and key `Content||Status||...` the status display.
+The RemoteClient processor provides a user interface which is defined by the remote client. Within `sentinel.py` the python dictionary `entry`, key `Content||Settings||...` defines the control elements and key `Content||Status||...` the status display.
 ![Raspberry Pi client registration](/assets/img/remote-client.png "User Interface on a data app")
 
 
