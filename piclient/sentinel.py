@@ -7,12 +7,13 @@ from threading import Timer
 entry={'Group':'Town','Folder':'Address','Name':'Location'}
 # settings
 entry['Content||Settings||captureTime||@function']='select'
-entry['Content||Settings||captureTime||@value']=3600
+entry['Content||Settings||captureTime||@value']='3600'
 entry['Content||Settings||captureTime||@excontainer']=True
-entry['Content||Settings||captureTime||@options||10']=10
-entry['Content||Settings||captureTime||@options||60']=60
-entry['Content||Settings||captureTime||@options||600']=600
-entry['Content||Settings||captureTime||@options||3600']=3600
+entry['Content||Settings||captureTime||@options||10']='10sec'
+entry['Content||Settings||captureTime||@options||60']='1min'
+entry['Content||Settings||captureTime||@options||600']='10min'
+entry['Content||Settings||captureTime||@options||3600']='1h'
+entry['Content||Settings||captureTime||@options||36000']='10h'
 
 entry['Content||Settings||mode||@function']='select'
 entry['Content||Settings||mode||@value']='alarm'
@@ -112,7 +113,7 @@ initOutputs()
 
 # process repsponse
 def writeOutputs(response):
-    global leds,strOutputs,entry
+    global leds,entry
     if type(response) is not bool:
         for key,value in response.items():
             key=key+'||@value'
@@ -128,6 +129,7 @@ def writeOutputs(response):
                     print(value)
             if key in entry:
                 entry[key]=value
+                #print(key+': '+entry[key])
 
 # ===================================== Sensors ===================================
 def initInputs():
@@ -138,7 +140,7 @@ def initInputs():
 initInputs()        
 
 def readInputs():
-    global leds,entry,activity
+    global entry
     entry['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
     entry['Content||Status||timestamp||@value']=int(time.time())
     entry['Content||Status||activity||@value']=activity
@@ -149,12 +151,12 @@ def readInputs():
         entry[entryKey]=int(leds[key].is_active)
     if hasGpioZero:
         entry['Content||Status||cpuTemperature||@value']=CPUTemperature().temperature
+    return dict(entry)
 
 # ===================================== Behaviour =================================
 activity=0
 
 def captureFileNames(filename):
-    global dirs
     frame=0
     while frame<4:
         yield dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_'+str(frame)+'.jpg'
@@ -162,38 +164,37 @@ def captureFileNames(filename):
 
 busyCapturing=False
 def capture(filename):
-    global busyCapturing,entry
+    global busyCapturing,leds
     busyCapturing=True
+    if entry['Content||Settings||mode||@value']!='idle':
+        leds['Content||Settings||light||@value'].on()
+    captureEntry=readInputs()
     if hasPiCamera and entry['Content||Settings||mode||@value']!='idle':
         with picamera.PiCamera(framerate=2) as camera:
             camera.start_preview()
             time.sleep(1)
             camera.capture_sequence(captureFileNames(filename),use_video_port=False,resize=None)
-        mediaItems2stack()
+            mediaItems2stack(captureEntry)
     busyCapturing=False
+    if (int(entry['Content||Settings||light||@value'])==1):
+        leds['Content||Settings||light||@value'].on()
+    else:
+        leds['Content||Settings||light||@value'].off()
  
 def motionA():
-    global busyCapturing,activity,entry
+    global busyCapturing,activity,leds
     activity+=4
     if (busyCapturing==False):
-        if entry['Content||Settings||mode||@value']!='idle':
-            leds['Content||Settings||light||@value'].on()
         if entry['Content||Settings||mode||@value']=='alarm':
             leds['Content||Settings||alarm||@value'].on()
-        entry['Content||Status||light||@value']=leds['Content||Settings||light||@value'].is_active
-        entry['Content||Status||alarm||@value']=leds['Content||Settings||alarm||@value'].is_active
         capture('motionA')
-        if (int(entry['Content||Settings||light||@value'])==1):
-            leds['Content||Settings||light||@value'].on()
-        else:
-            leds['Content||Settings||light||@value'].off()
         if (int(entry['Content||Settings||alarm||@value'])==1):
             leds['Content||Settings||alarm||@value'].on()
         else:
             leds['Content||Settings||alarm||@value'].off()
     
 def motionB():
-    global busyCapturing,activity
+    global activity
     activity+=1
     
 if 'pirA' in motionSensors:
@@ -202,7 +203,7 @@ if 'pirB' in motionSensors:
     motionSensors['pirB'].when_motion=motionB
 
 def updateActivity():
-    global entry,activity
+    global activity
     if (activity>0):
         activity-=1
     t=Timer(6,updateActivity)
@@ -211,28 +212,25 @@ updateActivity()
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
-def mediaItems2stack():
-    global dirs,entry
+def mediaItems2stack(captureEntry):
     for file in os.listdir(dirs['media']):
-        readInputs()
-        entry['Tag']='media'
+        captureEntry['Tag']='media'
         fileNameComps=file.split('_')
         if (len(fileNameComps)==3):
-            entry['Content||Status||timestamp||@value']=fileNameComps[1]
-            entry['Params||File||Name']=file
-            entry['Params||File||Extension']='jpeg'
-            entry['Params||File||MIME-Type']='image/jpeg'
+            captureEntry['Content||Status||timestamp||@value']=fileNameComps[1]
+            captureEntry['Params||File||Name']=file
+            captureEntry['Params||File||Extension']='jpeg'
+            captureEntry['Params||File||MIME-Type']='image/jpeg'
         else:
-            entry['Params||File||Name']=''
-            entry['Params||File||Extension']=''
-            entry['Params||File||MIME-Type']=''
-        datapoolclient.add2stack(entry,dirs['media']+'/'+file)
+            captureEntry['Params||File||Name']=''
+            captureEntry['Params||File||Extension']=''
+            captureEntry['Params||File||MIME-Type']=''
+        datapoolclient.add2stack(captureEntry,dirs['media']+'/'+file)
     
 def statusPolling():
-    global entry
-    readInputs()
-    entry['Tag']='status'
-    datapoolclient.add2stack(entry)
+    captureEntry=readInputs()
+    captureEntry['Tag']='status'
+    datapoolclient.add2stack(captureEntry)
     t=Timer(4.7,statusPolling)
     t.start()
 statusPolling()
@@ -258,7 +256,7 @@ stackProcessingLoop()
 # ==== periodic capturing =========================================================
 ticks=0
 def periodicCapture():
-    global ticks,entry,busyCapturing
+    global ticks
     captureTime=int(entry['Content||Settings||captureTime||@value'])
     if (captureTime!=0):
         if (ticks % captureTime==0):
