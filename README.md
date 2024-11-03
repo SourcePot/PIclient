@@ -24,5 +24,9 @@ You need to register the new client with one of the user accounts of your web ap
 Remember the registered client will have the same privileges as a user of this account. Following screenshot shows the registration of the client in row 0001:
 ![Raspberry Pi client registration](/assets/img/datapool_client_registration.png "Client registration within the Datapool web application")
 
+## Example
+The RemoteClient processor provides a user interface which is defined by the remote client. The python dictionary `entry` key `Content||Settings||...` defines the control elements and key `Content||Status||...` the status display.
+![Raspberry Pi client registration](/assets/img/remote-client.png "User Interface on a data app")
+
 
 
