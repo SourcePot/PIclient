@@ -20,8 +20,8 @@ You need to adjust the client.json file in the newly created settings sub-direct
 These details must match the client registration within the Datapool web application.
 
 ## First steps on the Datapool web application - Remote client registration
-You need to register the new client with one of the user accounts of your web application. To do this go to 'Admin' &rarr; 'Account' an expand 'App credentials' (Lock symbol).
-Remember the registered client will have the same privileges as a user of this account. Following screenshot shows the registration of the client in row 0001:
+You need to register the new client with one of the user accounts of your web application. To do this go to 'Admin' &rarr; 'Account' ankd expand 'App credentials' (Lock symbol).
+Remember the registered client will have the same privileges as the user of this account but limited to the selected scope. The scope for the PIclient must be class `SourcePot\Datapool\Processing\RemoteClient`. The following screenshot shows the registration of the client in row 0001:
 ![Raspberry Pi client registration](/assets/img/datapool_client_registration.png "Client registration within the Datapool web application")
 
 ## Example view on the Datapool web application
