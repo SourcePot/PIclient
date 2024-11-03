@@ -1,6 +1,6 @@
 # PI Client
 The Python code of this respository is for a Raspberry Pi. It enables the Raspberry Pi to connect to the Datapool web application.
-Refer to the 'PI view' respository which is the corresponding web page (App) within the Datapool web application. 
+It connects to the web application via the data pool processor `SourcePot\Datapool\Processing\RemoteClient` and can be used within any data app.
 
 'PI view' receives requests from multiple Raspberry Pis containing data and/or files.
 The web application's answer to a request contains the return data for the corresponding Raspberry Pi.
