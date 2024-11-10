@@ -6,81 +6,107 @@ from threading import Timer
 
 entry={'Group':'Town','Folder':'Address','Name':'Location'}
 # settings
+entry['Content||Settings||mode||@function']='select'
+entry['Content||Settings||mode||@value']='alarm'
+entry['Content||Settings||mode||@dataType']='string'
+entry['Content||Settings||mode||@excontainer']=''
+entry['Content||Settings||mode||@options||idle']='Idle'
+entry['Content||Settings||mode||@options||sms']='SMS'
+entry['Content||Settings||mode||@options||alarm']='Alarm'
+
 entry['Content||Settings||captureTime||@function']='select'
 entry['Content||Settings||captureTime||@value']='3600'
-entry['Content||Settings||captureTime||@excontainer']=True
+entry['Content||Settings||captureTime||@dataType']='int'
+entry['Content||Settings||captureTime||@excontainer']='1'
 entry['Content||Settings||captureTime||@options||10']='10sec'
 entry['Content||Settings||captureTime||@options||60']='1min'
 entry['Content||Settings||captureTime||@options||600']='10min'
 entry['Content||Settings||captureTime||@options||3600']='1h'
 entry['Content||Settings||captureTime||@options||36000']='10h'
 
-entry['Content||Settings||mode||@function']='select'
-entry['Content||Settings||mode||@value']='alarm'
-entry['Content||Settings||mode||@excontainer']=True
-entry['Content||Settings||mode||@options||idle']='Idle'
-entry['Content||Settings||mode||@options||sms']='SMS'
-entry['Content||Settings||mode||@options||alarm']='Alarm'
-
 entry['Content||Settings||light||@function']='select'
-entry['Content||Settings||light||@value']=0
-entry['Content||Settings||light||@excontainer']=True
+entry['Content||Settings||light||@value']='0'
+entry['Content||Settings||light||@dataType']='bool'
+entry['Content||Settings||light||@excontainer']='1'
 entry['Content||Settings||light||@options||0']='Off'
 entry['Content||Settings||light||@options||1']='On'
 
 entry['Content||Settings||alarm||@function']='select'
-entry['Content||Settings||alarm||@value']=0
-entry['Content||Settings||alarm||@excontainer']=True
+entry['Content||Settings||alarm||@value']='0'
+entry['Content||Settings||alarm||@dataType']='bool'
+entry['Content||Settings||alarm||@excontainer']='1'
 entry['Content||Settings||alarm||@options||0']='Off'
 entry['Content||Settings||alarm||@options||1']='On'
 
 entry['Content||Settings||A||@function']='select'
-entry['Content||Settings||A||@value']=0
-entry['Content||Settings||A||@excontainer']=True
+entry['Content||Settings||A||@value']='0'
+entry['Content||Settings||A||@dataType']='bool'
+entry['Content||Settings||A||@excontainer']='1'
 entry['Content||Settings||A||@options||0']='Off'
 entry['Content||Settings||A||@options||1']='On'
 
 entry['Content||Settings||B||@function']='select'
-entry['Content||Settings||B||@value']=0
-entry['Content||Settings||B||@excontainer']=True
+entry['Content||Settings||B||@value']='0'
+entry['Content||Settings||B||@dataType']='bool'
+entry['Content||Settings||B||@excontainer']='1'
 entry['Content||Settings||B||@options||0']='Off'
 entry['Content||Settings||B||@options||1']='On'
 # status
-entry['Content||Status||timestamp||@tag']='p'
-entry['Content||Status||timestamp||@value']:0
-entry['Content||Status||captureTime||@tag']='p'
-entry['Content||Status||captureTime||@value']:3600
 entry['Content||Status||mode||@tag']='p'
-entry['Content||Status||mode||@value']:'idle'
+entry['Content||Status||mode||@value']='idle'
+entry['Content||Status||mode||@dataType']='string'
+
+entry['Content||Status||timestamp||@tag']='p'
+entry['Content||Status||timestamp||@value']='0'
+entry['Content||Status||timestamp||@dataType']='int'
+
+entry['Content||Status||captureTime||@tag']='p'
+entry['Content||Status||captureTime||@value']='3600'
+entry['Content||Status||captureTime||@dataType']='int'
+
 entry['Content||Status||cpuTemperature||@tag']='p'
-entry['Content||Status||cpuTemperature||@value']=0
+entry['Content||Status||cpuTemperature||@value']='0'
+entry['Content||Status||cpuTemperature||@dataType']='float'
+
 entry['Content||Status||activity||@tag']='meter'
-entry['Content||Status||activity||@min']=0
-entry['Content||Status||activity||@max']=20
-entry['Content||Status||activity||@low']=0
-entry['Content||Status||activity||@high']=3
-entry['Content||Status||activity||@value']=0
+entry['Content||Status||activity||@min']='0'
+entry['Content||Status||activity||@max']='20'
+entry['Content||Status||activity||@low']='0'
+entry['Content||Status||activity||@high']='3'
+entry['Content||Status||activity||@value']='0'
+entry['Content||Status||activity||@dataType']='int'
 
 entry['Content||Status||light||@tag']='meter'
-entry['Content||Status||light||@min']=0
-entry['Content||Status||light||@max']=1
-entry['Content||Status||light||@value']=0
+entry['Content||Status||light||@min']='0'
+entry['Content||Status||light||@max']='1'
+entry['Content||Status||light||@value']='0'
+entry['Content||Status||light||@dataType']='bool'
 
 entry['Content||Status||alarm||@tag']='meter'
-entry['Content||Status||alarm||@min']=0
-entry['Content||Status||alarm||@max']=1
-entry['Content||Status||alarm||@high']=1
-entry['Content||Status||alarm||@value']=0
+entry['Content||Status||alarm||@min']='0'
+entry['Content||Status||alarm||@max']='1'
+entry['Content||Status||alarm||@high']='1'
+entry['Content||Status||alarm||@value']='0'
+entry['Content||Status||alarm||@dataType']='bool'
+
+entry['Content||Status||escalate||@tag']='meter'
+entry['Content||Status||escalate||@min']='0'
+entry['Content||Status||escalate||@max']='1'
+entry['Content||Status||escalate||@high']='1'
+entry['Content||Status||escalate||@value']='0'
+entry['Content||Status||escalate||@dataType']='bool'
 
 entry['Content||Status||A||@tag']='meter'
-entry['Content||Status||A||@min']=0
-entry['Content||Status||A||@max']=1
-entry['Content||Status||A||@value']=0
+entry['Content||Status||A||@min']='0'
+entry['Content||Status||A||@max']='1'
+entry['Content||Status||A||@value']='0'
+entry['Content||Status||A||@dataType']='bool'
 
 entry['Content||Status||B||@tag']='meter'
-entry['Content||Status||B||@min']=0
-entry['Content||Status||B||@max']=1
-entry['Content||Status||B||@value']=0
+entry['Content||Status||B||@min']='0'
+entry['Content||Status||B||@max']='1'
+entry['Content||Status||B||@value']='0'
+entry['Content||Status||B||@dataType']='bool'
 # file
 entry['Params||File||Name']=''
 entry['Params||File||Extension']=''
@@ -120,16 +146,16 @@ def writeOutputs(response):
             if key in leds:
                 if (int(value)>0):
                     leds[key].on()
-                    entry[key]=1
+                    entry[key]='1'
                 else:
                     leds[key].off()
-                    entry[key]=0
+                    entry[key]='0'
             if key in strOutputs:
                 if key=='console':
                     print(value)
             if key in entry:
                 entry[key]=value
-                #print(key+': '+entry[key])
+                #print(key+': '+str(entry[key]))
 
 # ===================================== Sensors ===================================
 def initInputs():
@@ -142,13 +168,13 @@ initInputs()
 def readInputs():
     global entry
     entry['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-    entry['Content||Status||timestamp||@value']=int(time.time())
+    entry['Content||Status||timestamp||@value']=time.time()
     entry['Content||Status||activity||@value']=activity
     entry['Content||Status||mode||@value']=entry['Content||Settings||mode||@value']
     entry['Content||Status||captureTime||@value']=entry['Content||Settings||captureTime||@value']
     for key,value in leds.items():
         entryKey=key.replace('Settings','Status')
-        entry[entryKey]=int(leds[key].is_active)
+        entry[entryKey]=str(int(leds[key].is_active))
     if hasGpioZero:
         entry['Content||Status||cpuTemperature||@value']=CPUTemperature().temperature
     return dict(entry)
@@ -182,13 +208,17 @@ def capture(filename):
         leds['Content||Settings||light||@value'].off()
  
 def motionA():
-    global busyCapturing,activity,leds
+    global busyCapturing,activity,leds,entry
     activity+=4
     if (busyCapturing==False):
         if entry['Content||Settings||mode||@value']=='alarm':
             leds['Content||Settings||alarm||@value'].on()
+            entry['Content||Status||escalate||@value']='1'
+        elif entry['Content||Settings||mode||@value']=='sms':
+            entry['Content||Status||escalate||@value']='1'
         capture('motionA')
-        if (int(entry['Content||Settings||alarm||@value'])==1):
+        entry['Content||Status||escalate||@value']='0'
+        if (str(entry['Content||Settings||alarm||@value'])=='1'):
             leds['Content||Settings||alarm||@value'].on()
         else:
             leds['Content||Settings||alarm||@value'].off()
