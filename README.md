@@ -16,7 +16,9 @@ You will need to adjust the url in datapoolclient.py to the web address of __you
 
 When you run sentinel.py for the first time datapoolclient.py will create a set of sub-directories.
 You need to adjust the client.json file in the newly created settings sub-directory. This file contains the access details, such as the Datapool web application url, the client_id and client_secret.
+
 ![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
+
 These details must match the client registration within the Datapool web application.
 
 ## First steps on the Datapool web application - Remote client registration
