@@ -22,7 +22,7 @@ These details must match the client registration within the Datapool web applica
 
 ## First steps on the Datapool web application - Remote client registration
 You need to register the new client with one of the user accounts of your web application. To do this go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
-Remember the registered client will have the same privileges as the user of this account but limited to the selected scope. The scope for the PIclient must be class `SourcePot\Datapool\Processing\RemoteClient`. The following screenshot shows the registration of the client in row 0001:
+Remember the registered client will have the same privileges as the user of this account but limited to the selected scope. The scope for the PIclient must be class `SourcePot\Datapool\Processing\RemoteClient` and the method `clientCall`. Multiple Raspberry Pis can use the same `client_id`. The location of a PI is set by `entry={'Group':'Town','Folder':'Address','Name':'Location'}` in `sentinel.py`. The following screenshot shows the registration of the client in row 0001:
 
 ![Raspberry Pi client registration](/assets/img/datapool_client_registration.png "Client registration within the Datapool web application")
 
