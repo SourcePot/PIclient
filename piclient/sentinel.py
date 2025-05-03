@@ -4,16 +4,23 @@ import time
 import pkgutil
 from threading import Timer
 
+# Entry creation: The entry contains the (initial) Settings and Status. 
+# Settings hold the initial data for settings creation on the server, i.e. a blueprint of the settings data structure.
+# After the first data is received from the server, the "piclient" Settings data will be updated from the server data to control the "piclient". 
+# Status contains only data to be sent from the "piclient" to the server.
+# The entry structure is a php datapool flat array (dictionarry in Python) with the entry separator "||". 
+# The Entry Content Settings and Status have a datapool defintion structure.
 entry={'Group':'Town','Folder':'Address','Name':'Location'}
-# settings
+# ADD SETTINGS - mode
 entry['Content||Settings||mode||@function']='select'
 entry['Content||Settings||mode||@value']='alarm'
 entry['Content||Settings||mode||@dataType']='string'
 entry['Content||Settings||mode||@excontainer']=''
 entry['Content||Settings||mode||@options||idle']='Idle'
+entry['Content||Settings||mode||@options||capture']='Capture'
 entry['Content||Settings||mode||@options||sms']='SMS'
 entry['Content||Settings||mode||@options||alarm']='Alarm'
-
+# ADD SETTINGS - cature time
 entry['Content||Settings||captureTime||@function']='select'
 entry['Content||Settings||captureTime||@value']='3600'
 entry['Content||Settings||captureTime||@dataType']='int'
@@ -23,51 +30,51 @@ entry['Content||Settings||captureTime||@options||60']='1min'
 entry['Content||Settings||captureTime||@options||600']='10min'
 entry['Content||Settings||captureTime||@options||3600']='1h'
 entry['Content||Settings||captureTime||@options||36000']='10h'
-
+# ADD SETTINGS - light
 entry['Content||Settings||light||@function']='select'
 entry['Content||Settings||light||@value']='0'
 entry['Content||Settings||light||@dataType']='bool'
 entry['Content||Settings||light||@excontainer']='1'
 entry['Content||Settings||light||@options||0']='Off'
 entry['Content||Settings||light||@options||1']='On'
-
+# ADD SETTINGS - alarm
 entry['Content||Settings||alarm||@function']='select'
 entry['Content||Settings||alarm||@value']='0'
 entry['Content||Settings||alarm||@dataType']='bool'
 entry['Content||Settings||alarm||@excontainer']='1'
 entry['Content||Settings||alarm||@options||0']='Off'
 entry['Content||Settings||alarm||@options||1']='On'
-
+# ADD SETTINGS - A
 entry['Content||Settings||A||@function']='select'
 entry['Content||Settings||A||@value']='0'
 entry['Content||Settings||A||@dataType']='bool'
 entry['Content||Settings||A||@excontainer']='1'
 entry['Content||Settings||A||@options||0']='Off'
 entry['Content||Settings||A||@options||1']='On'
-
+# ADD SETTINGS - B
 entry['Content||Settings||B||@function']='select'
 entry['Content||Settings||B||@value']='0'
 entry['Content||Settings||B||@dataType']='bool'
 entry['Content||Settings||B||@excontainer']='1'
 entry['Content||Settings||B||@options||0']='Off'
 entry['Content||Settings||B||@options||1']='On'
-# status
+# ADD STATUS - mode
 entry['Content||Status||mode||@tag']='p'
 entry['Content||Status||mode||@value']='idle'
 entry['Content||Status||mode||@dataType']='string'
-
+# ADD STATUS - timestamp
 entry['Content||Status||timestamp||@tag']='p'
 entry['Content||Status||timestamp||@value']='0'
 entry['Content||Status||timestamp||@dataType']='int'
-
+# ADD STATUS - captureTime
 entry['Content||Status||captureTime||@tag']='p'
 entry['Content||Status||captureTime||@value']='3600'
 entry['Content||Status||captureTime||@dataType']='int'
-
+# ADD STATUS - cpuTemperature
 entry['Content||Status||cpuTemperature||@tag']='p'
 entry['Content||Status||cpuTemperature||@value']='0'
 entry['Content||Status||cpuTemperature||@dataType']='float'
-
+# ADD STATUS - activity
 entry['Content||Status||activity||@tag']='meter'
 entry['Content||Status||activity||@min']='0'
 entry['Content||Status||activity||@max']='20'
@@ -75,43 +82,44 @@ entry['Content||Status||activity||@low']='0'
 entry['Content||Status||activity||@high']='3'
 entry['Content||Status||activity||@value']='0'
 entry['Content||Status||activity||@dataType']='int'
-
+# ADD STATUS - light
 entry['Content||Status||light||@tag']='meter'
 entry['Content||Status||light||@min']='0'
 entry['Content||Status||light||@max']='1'
 entry['Content||Status||light||@value']='0'
 entry['Content||Status||light||@dataType']='bool'
-
+# ADD STATUS - alarm
 entry['Content||Status||alarm||@tag']='meter'
 entry['Content||Status||alarm||@min']='0'
 entry['Content||Status||alarm||@max']='1'
 entry['Content||Status||alarm||@high']='1'
 entry['Content||Status||alarm||@value']='0'
 entry['Content||Status||alarm||@dataType']='bool'
-
+# ADD STATUS - escalate
 entry['Content||Status||escalate||@tag']='meter'
 entry['Content||Status||escalate||@min']='0'
 entry['Content||Status||escalate||@max']='1'
 entry['Content||Status||escalate||@high']='1'
 entry['Content||Status||escalate||@value']='0'
 entry['Content||Status||escalate||@dataType']='bool'
-
+# ADD STATUS - A
 entry['Content||Status||A||@tag']='meter'
 entry['Content||Status||A||@min']='0'
 entry['Content||Status||A||@max']='1'
 entry['Content||Status||A||@value']='0'
 entry['Content||Status||A||@dataType']='bool'
-
+# ADD STATUS - B
 entry['Content||Status||B||@tag']='meter'
 entry['Content||Status||B||@min']='0'
 entry['Content||Status||B||@max']='1'
 entry['Content||Status||B||@value']='0'
 entry['Content||Status||B||@dataType']='bool'
-# file
+# ADD PARAMS - file
 entry['Params||File||Name']=''
 entry['Params||File||Extension']=''
 entry['Params||File||MIME-Type']=''
 
+# add internal lists
 motionSensors={}
 leds={}
 strOutputs={}
