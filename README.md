@@ -2,7 +2,7 @@
 The Python code of this repository is for a Raspberry Pi. It enables the Raspberry Pi to connect to the Datapool web application.
 It connects to the web application via the Datapool processor `SourcePot\Datapool\Processing\RemoteClient` and can be used within any data app.
 
-'RemoteClient' receives requests from e.g. multiple Raspberry Pis containing data (status information, senosry data) and/or files (images, videos). The web application's answer to each request contains the settings for the respective Raspberry Pi.
+'RemoteClient' receives requests from e.g. multiple Raspberry Pis containing data (status information, sensory data) and/or files (images, videos). The web application's answer to each request contains the settings for the respective Raspberry Pi.
 
 ## First steps on the side of the Raspberry Pi
 To setup the Raspberry Pi client you need to create a folder on your Raspberry Pi and copy the following three python files into this folder: 
