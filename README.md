@@ -13,10 +13,10 @@ To setup the Raspberry Pi client you need to create a folder on your Raspberry P
 You will need to adjust the url in datapoolclient.py to the web address of __your__ Datapool web application:
 ![URL setting within datapoolclient.py](/assets/img/url.png "URL setting within datapoolclient.py")
 
-When sentinel.py runs for the first time, datapoolclient.py will create a set of sub-directories.
+When sentinel.py runs for the first time, datapoolclient.py will create a set of sub-directories. You will need to adjust the client.json file in the newly created settings sub-directory.
 
 > [!IMPORTANT]  
-> You will need to adjust the client.json file in the newly created settings sub-directory. This file contains the access details, such as the Datapool web application url, the client_id and client_secret.
+> The client.json file contains the access details, such as the Datapool web application url, the client_id and client_secret. These need to match your Datapool remote client registration. 
 
 These details must match the client registration within the Datapool web application.
 
