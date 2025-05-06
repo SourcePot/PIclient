@@ -1,6 +1,6 @@
 # Raspberry Pi Client
 The Python code of this repository is for a Raspberry Pi. It enables the Raspberry Pi to connect to the Datapool web application.
-It connects to the web application via the Datapool processor `SourcePot\Datapool\Processing\RemoteClient` and can be used within any data app.
+It connects to the web application via the Datapool processor `SourcePot\Datapool\Processing\RemoteClient` and it can be used within any data app.
 
 'RemoteClient' receives requests from e.g. multiple Raspberry Pis containing data (status information, sensory data) and/or files (images, videos). The web application's answer to each request contains the settings for the respective Raspberry Pi.
 
@@ -13,15 +13,17 @@ To setup the Raspberry Pi client you need to create a folder on your Raspberry P
 You will need to adjust the url in datapoolclient.py to the web address of __your__ Datapool web application:
 ![URL setting within datapoolclient.py](/assets/img/url.png "URL setting within datapoolclient.py")
 
-When you run sentinel.py for the first time datapoolclient.py will create a set of sub-directories.
-You need to adjust the client.json file in the newly created settings sub-directory. This file contains the access details, such as the Datapool web application url, the client_id and client_secret.
+When sentinel.py runs for the first time, datapoolclient.py will create a set of sub-directories.
+
+> [!IMPORTANT]  
+> You will need to adjust the client.json file in the newly created settings sub-directory. This file contains the access details, such as the Datapool web application url, the client_id and client_secret.
 
 ![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
 These details must match the client registration within the Datapool web application.
 
 ## First steps on the Datapool web application - Remote client registration
-You need to register the new client with one of the user accounts of your web application. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
+You need to register the new client with one of the Datappol user accounts. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
 Remember the registered client will have the same privileges as the user of this account but limited to the selected scope. The scope for the Raspberry Piclient must be class `SourcePot\Datapool\Processing\RemoteClient` and the method `clientCall`. The method clientCall of class SourcePot\Datapool\Processing\RemoteClient will handle the client requests.
 
 The following screenshot shows the registration of the client in row 0001:
