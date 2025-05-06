@@ -16,13 +16,13 @@ You will need to adjust the url in datapoolclient.py to the web address of __you
 When sentinel.py runs for the first time, datapoolclient.py will create a set of sub-directories. You will need to adjust the client.json file in the newly created settings sub-directory.
 
 > [!IMPORTANT]  
-> The `client.json` file contains the access details, such as the Datapool web application url, the client_id and client_secret. These need to match your Datapool remote client registration. 
+> The `client.json` file contains the access details, such as the Datapool web application url, the client_id and client_secret.
 
 These details must match the client registration within the Datapool web application.
 
 ![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
-## First steps on the Datapool web application - Remote client registration
+## Remote client registration within Datapool
 You need to register the new client with one of the Datappol user accounts. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
 Remember the registered client will have the same privileges as the user of this account but limited to the selected scope. The scope for the Raspberry Piclient must be class `SourcePot\Datapool\Processing\RemoteClient` and the method `clientCall`. The method clientCall of class SourcePot\Datapool\Processing\RemoteClient will handle the client requests.
 
