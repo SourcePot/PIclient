@@ -18,9 +18,9 @@ When sentinel.py runs for the first time, datapoolclient.py will create a set of
 > [!IMPORTANT]  
 > You will need to adjust the client.json file in the newly created settings sub-directory. This file contains the access details, such as the Datapool web application url, the client_id and client_secret.
 
-![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
-
 These details must match the client registration within the Datapool web application.
+
+![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
 ## First steps on the Datapool web application - Remote client registration
 You need to register the new client with one of the Datappol user accounts. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
