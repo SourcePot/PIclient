@@ -8,7 +8,9 @@ The typical application is a motion sensor triggered camera. Here are some examp
 
 ![Repair and cleaning session](/assets/img/repair.jpg "Repair and cleaning session")
 
-'RemoteClient' receives requests from e.g. multiple Raspberry Pis containing data (status information, sensory data) and/or files (images, videos). The web application's answer to each request contains the settings for the respective Raspberry Pi.
+## How does it work?
+
+The 'RemoteClient' class receives requests from e.g. multiple Raspberry Pis containing data (status information, sensory data) and/or files (images, videos). The web application's answer to each request contains the settings for the respective Raspberry Pi.
 
 ## First steps on the side of the Raspberry Pi
 To setup the Raspberry Pi client you need to create a folder on your Raspberry Pi and copy the following three python files into this folder: 
