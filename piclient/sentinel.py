@@ -4,14 +4,8 @@ import time
 import pkgutil
 from threading import Timer
 
-# Entry creation: The entry contains the (initial) Settings and Status. 
-# Settings hold the initial data for settings creation on the server, i.e. a blueprint of the settings data structure.
-# After the first data is received from the server, the "piclient" Settings data will be updated from the server data to control the "piclient". 
-# Status contains only data to be sent from the "piclient" to the server.
-# The entry structure is a php datapool flat array (dictionarry in Python) with the entry separator "||". 
-# The Entry Content Settings and Status have a datapool defintion structure.
-entry={'Group':'Town','Folder':'Address','Name':'Location'}
-# ADD SETTINGS - mode
+entry={'Group':'Town','Folder':'Street','Name':'Location'}
+# settings
 entry['Content||Settings||mode||@function']='select'
 entry['Content||Settings||mode||@value']='alarm'
 entry['Content||Settings||mode||@dataType']='string'
@@ -20,7 +14,7 @@ entry['Content||Settings||mode||@options||idle']='Idle'
 entry['Content||Settings||mode||@options||capture']='Capture'
 entry['Content||Settings||mode||@options||sms']='SMS'
 entry['Content||Settings||mode||@options||alarm']='Alarm'
-# ADD SETTINGS - cature time
+
 entry['Content||Settings||captureTime||@function']='select'
 entry['Content||Settings||captureTime||@value']='3600'
 entry['Content||Settings||captureTime||@dataType']='int'
@@ -30,51 +24,51 @@ entry['Content||Settings||captureTime||@options||60']='1min'
 entry['Content||Settings||captureTime||@options||600']='10min'
 entry['Content||Settings||captureTime||@options||3600']='1h'
 entry['Content||Settings||captureTime||@options||36000']='10h'
-# ADD SETTINGS - light
+
 entry['Content||Settings||light||@function']='select'
 entry['Content||Settings||light||@value']='0'
 entry['Content||Settings||light||@dataType']='bool'
 entry['Content||Settings||light||@excontainer']='1'
 entry['Content||Settings||light||@options||0']='Off'
 entry['Content||Settings||light||@options||1']='On'
-# ADD SETTINGS - alarm
+
 entry['Content||Settings||alarm||@function']='select'
 entry['Content||Settings||alarm||@value']='0'
 entry['Content||Settings||alarm||@dataType']='bool'
 entry['Content||Settings||alarm||@excontainer']='1'
 entry['Content||Settings||alarm||@options||0']='Off'
 entry['Content||Settings||alarm||@options||1']='On'
-# ADD SETTINGS - A
+
 entry['Content||Settings||A||@function']='select'
 entry['Content||Settings||A||@value']='0'
 entry['Content||Settings||A||@dataType']='bool'
 entry['Content||Settings||A||@excontainer']='1'
 entry['Content||Settings||A||@options||0']='Off'
 entry['Content||Settings||A||@options||1']='On'
-# ADD SETTINGS - B
+
 entry['Content||Settings||B||@function']='select'
 entry['Content||Settings||B||@value']='0'
 entry['Content||Settings||B||@dataType']='bool'
 entry['Content||Settings||B||@excontainer']='1'
 entry['Content||Settings||B||@options||0']='Off'
 entry['Content||Settings||B||@options||1']='On'
-# ADD STATUS - mode
+# status
 entry['Content||Status||mode||@tag']='p'
 entry['Content||Status||mode||@value']='idle'
 entry['Content||Status||mode||@dataType']='string'
-# ADD STATUS - timestamp
+
 entry['Content||Status||timestamp||@tag']='p'
 entry['Content||Status||timestamp||@value']='0'
 entry['Content||Status||timestamp||@dataType']='int'
-# ADD STATUS - captureTime
+
 entry['Content||Status||captureTime||@tag']='p'
 entry['Content||Status||captureTime||@value']='3600'
 entry['Content||Status||captureTime||@dataType']='int'
-# ADD STATUS - cpuTemperature
+
 entry['Content||Status||cpuTemperature||@tag']='p'
 entry['Content||Status||cpuTemperature||@value']='0'
 entry['Content||Status||cpuTemperature||@dataType']='float'
-# ADD STATUS - activity
+
 entry['Content||Status||activity||@tag']='meter'
 entry['Content||Status||activity||@min']='0'
 entry['Content||Status||activity||@max']='20'
@@ -82,47 +76,49 @@ entry['Content||Status||activity||@low']='0'
 entry['Content||Status||activity||@high']='3'
 entry['Content||Status||activity||@value']='0'
 entry['Content||Status||activity||@dataType']='int'
-# ADD STATUS - light
+
 entry['Content||Status||light||@tag']='meter'
 entry['Content||Status||light||@min']='0'
 entry['Content||Status||light||@max']='1'
 entry['Content||Status||light||@value']='0'
 entry['Content||Status||light||@dataType']='bool'
-# ADD STATUS - alarm
+
 entry['Content||Status||alarm||@tag']='meter'
 entry['Content||Status||alarm||@min']='0'
 entry['Content||Status||alarm||@max']='1'
 entry['Content||Status||alarm||@high']='1'
 entry['Content||Status||alarm||@value']='0'
 entry['Content||Status||alarm||@dataType']='bool'
-# ADD STATUS - escalate
+
 entry['Content||Status||escalate||@tag']='meter'
 entry['Content||Status||escalate||@min']='0'
 entry['Content||Status||escalate||@max']='1'
 entry['Content||Status||escalate||@high']='1'
 entry['Content||Status||escalate||@value']='0'
 entry['Content||Status||escalate||@dataType']='bool'
-# ADD STATUS - A
+
 entry['Content||Status||A||@tag']='meter'
 entry['Content||Status||A||@min']='0'
 entry['Content||Status||A||@max']='1'
 entry['Content||Status||A||@value']='0'
 entry['Content||Status||A||@dataType']='bool'
-# ADD STATUS - B
+
 entry['Content||Status||B||@tag']='meter'
 entry['Content||Status||B||@min']='0'
 entry['Content||Status||B||@max']='1'
 entry['Content||Status||B||@value']='0'
 entry['Content||Status||B||@dataType']='bool'
-# ADD PARAMS - file
+
+entry['Content||Status||Msg||@tag']='p'
+entry['Content||Status||Msg||@value']='Started'
+entry['Content||Status||Msg||@dataType']='string'
+
+# file
 entry['Params||File||Name']=''
 entry['Params||File||Extension']=''
 entry['Params||File||MIME-Type']=''
 
-# add internal lists
-motionSensors={}
-leds={}
-strOutputs={}
+strOutputs={'Content||Settings||Feedback':''}
 
 dirs=datapoolclient.getDirs()
 
@@ -133,8 +129,19 @@ if hasPiCamera:
 hasGpioZero=pkgutil.find_loader('gpiozero')
 if hasGpioZero:
     from gpiozero import MotionSensor,CPUTemperature,LED
-
+else:
+    print('Problem: gpiozero missing')
+    
 # ===================================== Outputs ===================================
+def setEntry(key,value):
+    global entry
+    if key in entry:
+        if (type(value) is bool):
+            entry[key]=str(int(value))
+        else:
+            entry[key]=str(value)
+leds={}
+
 def initOutputs():
     global leds
     if hasGpioZero:
@@ -142,53 +149,49 @@ def initOutputs():
         leds['Content||Settings||light||@value']=LED(18,initial_value=False)
         leds['Content||Settings||A||@value']=LED(22,initial_value=False)
         leds['Content||Settings||B||@value']=LED(23,initial_value=False)
-    print('Client started')
+
 initOutputs()
 
 # process repsponse
 def writeOutputs(response):
-    global leds,entry
     if type(response) is not bool:
         for key,value in response.items():
-            key=key+'||@value'
-            if key in leds:
-                if (int(value)>0):
-                    leds[key].on()
-                    entry[key]='1'
-                else:
-                    leds[key].off()
-                    entry[key]='0'
-            if key in strOutputs:
-                if key=='console':
-                    print(value)
-            if key in entry:
-                entry[key]=value
-                #print(key+': '+str(entry[key]))
+            if '||Settings||' in key:
+                key=key+'||@value'
+                if key in entry:
+                    setEntry(key,value)
+                if key in leds:
+                    setLed(key,value)
+                if key in strOutputs:
+                    print(key+str(value))
+
+def setLed(key,value):
+    global leds
+    if key in leds:
+        if (int(value)>0):
+            leds[key].on()
+            pass
+        else:
+            leds[key].off()
+            pass
 
 # ===================================== Sensors ===================================
-def initInputs():
-    global motionSensors
-    if hasGpioZero:
-        motionSensors['pirA']=MotionSensor(pin=27,pull_up=None,active_state=True)
-        motionSensors['pirB']=MotionSensor(pin=24,pull_up=None,active_state=True)
-initInputs()        
+def readLeds():
+    for key in leds:
+        entryKey=key.replace('||Settings||','||Status||')
+        setEntry(entryKey,leds[key].is_active)
 
 def readInputs():
-    global entry
-    entry['Date']=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
-    entry['Content||Status||timestamp||@value']=time.time()
-    entry['Content||Status||activity||@value']=activity
-    entry['Content||Status||mode||@value']=entry['Content||Settings||mode||@value']
-    entry['Content||Status||captureTime||@value']=entry['Content||Settings||captureTime||@value']
-    for key,value in leds.items():
-        entryKey=key.replace('Settings','Status')
-        entry[entryKey]=str(int(leds[key].is_active))
+    readLeds()
+    setEntry('Date',time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()))
+    setEntry('Content||Status||timestamp||@value',time.time())
+    setEntry('Content||Status||mode||@value',entry['Content||Settings||mode||@value'])
+    setEntry('Content||Status||captureTime||@value',entry['Content||Settings||captureTime||@value'])
     if hasGpioZero:
-        entry['Content||Status||cpuTemperature||@value']=CPUTemperature().temperature
+        setEntry('Content||Status||cpuTemperature||@value',CPUTemperature().temperature)
     return dict(entry)
 
 # ===================================== Behaviour =================================
-activity=0
 
 def captureFileNames(filename):
     frame=0
@@ -197,56 +200,71 @@ def captureFileNames(filename):
         frame+=1
 
 busyCapturing=False
+
 def capture(filename):
-    global busyCapturing,leds
-    busyCapturing=True
-    if entry['Content||Settings||mode||@value']!='idle':
-        leds['Content||Settings||light||@value'].on()
-    captureEntry=readInputs()
-    if hasPiCamera and entry['Content||Settings||mode||@value']!='idle':
-        with picamera.PiCamera(framerate=2) as camera:
-            camera.start_preview()
-            time.sleep(1)
-            camera.capture_sequence(captureFileNames(filename),use_video_port=False,resize=None)
-            mediaItems2stack(captureEntry)
-    busyCapturing=False
-    if (int(entry['Content||Settings||light||@value'])==1):
-        leds['Content||Settings||light||@value'].on()
+    global busyCapturing
+    if busyCapturing==False:
+        busyCapturing=True
+        if entry['Content||Settings||mode||@value']!='idle':
+            setLed('Content||Settings||light||@value',1)
+        captureEntry=readInputs()
+        if hasPiCamera and entry['Content||Settings||mode||@value']!='idle':
+            with picamera.PiCamera(framerate=2) as camera:
+                camera.start_preview()
+                time.sleep(1)
+                camera.capture_sequence(captureFileNames(filename),use_video_port=False,resize=None)
+                mediaItems2stack(captureEntry)
+        if (int(entry['Content||Settings||light||@value'])==1):
+            setLed('Content||Settings||light||@value',1)
+        else:
+            setLed('Content||Settings||light||@value',0)
+        busyCapturing=False
     else:
-        leds['Content||Settings||light||@value'].off()
+        print('Too busy, skipped capturing')
  
 def motionA():
-    global busyCapturing,activity,leds,entry
-    activity+=4
-    if (busyCapturing==False):
-        if entry['Content||Settings||mode||@value']=='alarm':
-            leds['Content||Settings||alarm||@value'].on()
-            entry['Content||Status||escalate||@value']='1'
-        elif entry['Content||Settings||mode||@value']=='sms':
-            entry['Content||Status||escalate||@value']='1'
-        capture('motionA')
-        entry['Content||Status||escalate||@value']='0'
-        if (str(entry['Content||Settings||alarm||@value'])=='1'):
-            leds['Content||Settings||alarm||@value'].on()
-        else:
-            leds['Content||Settings||alarm||@value'].off()
+    addActivity(4)
+    if entry['Content||Settings||mode||@value']=='alarm':
+        setLed('Content||Settings||alarm||@value',1)
+        setEntry('Content||Status||escalate||@value',1)
+    elif entry['Content||Settings||mode||@value']=='sms':
+        setEntry('Content||Status||escalate||@value',1)
+    capture('motionA')
+    setEntry('Content||Status||escalate||@value',0)
+    if (int(entry['Content||Settings||alarm||@value'])==1):
+        setLed('Content||Settings||alarm||@value',1)
+    else:
+        setLed('Content||Settings||alarm||@value',0)
     
 def motionB():
-    global activity
-    activity+=1
-    
-if 'pirA' in motionSensors:
-    motionSensors['pirA'].when_motion=motionA
-if 'pirB' in motionSensors:
-    motionSensors['pirB'].when_motion=motionB
+    print('Motion B')
+    addActivity(1)
 
-def updateActivity():
+if hasGpioZero:
+    pirA=MotionSensor(27)
+    pirA.when_motion=motionA
+    pirB=MotionSensor(4)
+    pirB=when_motion=motionB
+
+print('Client initialized')
+
+activity=0
+
+def addActivity(add):
     global activity
-    if (activity>0):
-        activity-=1
-    t=Timer(6,updateActivity)
+    if (add>0):
+        activity=activity+add
+    elif (activity>0):
+        activity=activity+add
+    else:
+        activity=0
+    setEntry('Content||Status||activity||@value',activity)
+
+def updateActivityTimer():
+    addActivity(-1)
+    t=Timer(6,updateActivityTimer)
     t.start()
-updateActivity()
+updateActivityTimer()
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
@@ -264,6 +282,7 @@ def mediaItems2stack(captureEntry):
             captureEntry['Params||File||Extension']=''
             captureEntry['Params||File||MIME-Type']=''
         datapoolclient.add2stack(captureEntry,dirs['media']+'/'+file)
+        setEntry('Content||Status||Msg||@value','')
     
 def statusPolling():
     captureEntry=readInputs()
@@ -298,8 +317,7 @@ def periodicCapture():
     captureTime=int(entry['Content||Settings||captureTime||@value'])
     if (captureTime!=0):
         if (ticks % captureTime==0):
-            if (busyCapturing==False):
-                capture('capture')
+            capture('capture')
     ticks+=1
     t=Timer(1.0,periodicCapture)
     t.start()

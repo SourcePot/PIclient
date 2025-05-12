@@ -5,6 +5,7 @@ import time
 import requests
 import json
 import base64
+from pathlib import Path
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
 
@@ -17,6 +18,7 @@ def jsonDecode(string):
     try:
         json_obj=json.loads(string)
     except ValueError as e:
+        print(repr(e))
         return True
     return json_obj
 
@@ -43,11 +45,9 @@ accessFile=dirs['settings']+'/client.json'
 tokenFile=dirs['settings']+'/token.json'
 
 def getDirs():
-    global dirs
-    return dirs
+    return dict(dirs)
 
 def addLog(log={'Info':'Test log entry'}):
-    global dirs
     newLine=''
     for key in log:
         newLine+=str(key)+": "+str(log[key])+","
@@ -63,8 +63,6 @@ def addLog(log={'Info':'Test log entry'}):
         f.write(logFileContent)
 
 def getAccess():
-    global url
-    global accessFile
     access={'client_id':'pi','client_secret':'****','url':url}
     if os.path.isfile(accessFile):
         with open(accessFile) as f:
@@ -88,6 +86,7 @@ def requestNewAccessToken(access):
         payload['Authorization']='Basic '.encode('ascii')+base64.b64encode(encoded)
         resp=requests.post(access['url'],data=payload)
     except requests.exceptions.RequestException as e:
+        print(repr(e))
         return False
     return jsonDecode(resp.text)
 
@@ -101,7 +100,6 @@ def checkToken(token:dict[str,str]={}):
         return initToken
 
 def getAccessToken(access):
-    global tokenFile
     token=checkToken()
     if os.path.isfile(tokenFile):
         with open(tokenFile,"r") as f:
@@ -124,9 +122,7 @@ def getAccessToken(access):
 items=[]
 itemsLength=0
 def getNextItem():
-    global dirs
-    global items
-    global itemsLength
+    global items,itemsLength
     items=os.listdir(dirs['comstack'])
     if not items:
         return False
@@ -134,10 +130,12 @@ def getNextItem():
         items=[payload for payload in items if "payload" in payload]
         items=sorted(items)
         itemsLength=len(items)
-        return items.pop(0)
+        if not items:
+            return False
+        else:
+            return items.pop(0)
 
 def add2stack(payload:dict[str,str]={},attachmentFileName=''):
-    global dirs
     global maxStackLength
     if itemsLength>maxStackLength:
         addLog({'warning':'Too many items, skipped add2stack'})
@@ -173,13 +171,14 @@ def clientRequest(payload):
         else:
             resp=requests.post(access['url'],data=payload)
     except requests.exceptions.RequestException as e:
+        print(repr(e))
         return False
     return jsonDecode(resp.text)
 
 
 response:dict[str,str]={}
 def processStack():
-    global dirs,response
+    global response
     nextItem=getNextItem()
     if type(nextItem) is bool:
         result=True
@@ -193,8 +192,9 @@ def processStack():
             try:
                 payload=json.loads(payloadStr)
             except json.decoder.JSONDecodeError:
-                print('Payload file json error: '+payloadStr)
-                addLog({'error':'Payload file json error, payload="'+payloadStr+'"'})
+                print('Payload file json error: '+payloadFileName)
+                addLog({'error':'Payload file json error, payload="'+payloadFileName+'"'})
+                Path(payloadFileName).unlink()
                 payload={}
             result=clientRequest(payload)
             #print(result['token_expires_in_sec'])
