@@ -31,7 +31,7 @@ These details must match the client registration within the Datapool web applica
 ![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
 ## Remote client registration within Datapool
-You will need to register the new client with one of the Datappol user accounts. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
+You will need to register the new client with one of the Datapool user accounts. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
 Remember the registered client will have the same privileges as the user of this account but limited to the selected scope. The scope for the Raspberry Piclient must be class `SourcePot\Datapool\Processing\RemoteClient` and the method `clientCall`. The method clientCall of class SourcePot\Datapool\Processing\RemoteClient will handle the client requests.
 
 The following screenshot shows the registration of the client in row 0001:
