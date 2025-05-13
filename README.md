@@ -40,6 +40,10 @@ The following screenshot shows the registration of the client in row 0001:
 
 Multiple Raspberry Pis can run as clients with the same `client_id`. The Raspberry Pis are are distinguished by their location and the location of a Raspberry Pi is set by `entry={'Group':'Town','Folder':'Address','Name':'Location'}` in `sentinel.py`. Just replace Town, Address and Location with the correct values. When a Raspberry Pi connects for the very first time to the RemoteClient a database entry in the table `remotecliwent`is created based on Town, Address and Location. The entry's EntryId is '...definition' and contains the html widget template definitions for status and settings. These are provided by the Raspberry Pi, i.e. the Raspberry Pi's Python script defines the user interface within the Datapool web application. The settings, that control the Raspberry Pi, will be stored in the same table as entry with an EntryId="..._setting". The latest data provided by the Raspberry Pi is saved as entry in the same table with the EntryId="..._lastentry".
 
+![Client host communication](/assets/img/client-host-communication.png "Client host communication")
+
+Initially the client needs to request a new access token. Aften having received the access token, the client can send client (status) data such as measurements, senosor data and optionally media files such as images or movies (POST request). The Datapool host answers the host request with new settings data for the client.
+
 ## Example view on the Datapool web application
 The RemoteClient processor provides an user interface which is actually defined by the Python code of the remote client itself. Within the `sentinel.py` file the Python dictionary `entry`, key `Content||Settings||...` defines the control elements and `entry` key `Content||Status||...` the status elements (display). This allows each remote client to provide different functionalities and to specify its' specific control elements (buttons, drop-down menus, slider etc.) for the Datapool web application.
 
