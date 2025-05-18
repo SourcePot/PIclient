@@ -4,7 +4,7 @@ import time
 import pkgutil
 from threading import Timer
 
-entry={'Group':'Town','Folder':'Street','Name':'Location'}
+entry={'Group':'München','Folder':'Guntherstraße 13','Name':'Wohnzimmer'}
 # settings
 entry['Content||Settings||mode||@function']='select'
 entry['Content||Settings||mode||@value']='alarm'
@@ -57,57 +57,73 @@ entry['Content||Status||mode||@tag']='p'
 entry['Content||Status||mode||@value']='idle'
 entry['Content||Status||mode||@dataType']='string'
 
-entry['Content||Status||timestamp||@tag']='p'
-entry['Content||Status||timestamp||@value']='0'
-entry['Content||Status||timestamp||@dataType']='int'
-
 entry['Content||Status||captureTime||@tag']='p'
 entry['Content||Status||captureTime||@value']='3600'
 entry['Content||Status||captureTime||@dataType']='int'
 
-entry['Content||Status||cpuTemperature||@tag']='p'
-entry['Content||Status||cpuTemperature||@value']='0'
-entry['Content||Status||cpuTemperature||@dataType']='float'
-
 entry['Content||Status||activity||@tag']='meter'
 entry['Content||Status||activity||@min']='0'
 entry['Content||Status||activity||@max']='20'
+entry['Content||Status||activity||@color']='green'
 entry['Content||Status||activity||@low']='0'
 entry['Content||Status||activity||@high']='3'
 entry['Content||Status||activity||@value']='0'
+entry['Content||Status||activity||@isSignal']='1'
 entry['Content||Status||activity||@dataType']='int'
 
-entry['Content||Status||light||@tag']='meter'
-entry['Content||Status||light||@min']='0'
-entry['Content||Status||light||@max']='1'
+entry['Content||Status||light||@class']='SourcePot\Datapool\Tools\MiscTools'
+entry['Content||Status||light||@function']='bool2html'
+entry['Content||Status||light||@min']='1'
+entry['Content||Status||light||@max']='0'
+entry['Content||Status||light||@color']='blue'
 entry['Content||Status||light||@value']='0'
+entry['Content||Status||light||@isSignal']='1'
 entry['Content||Status||light||@dataType']='bool'
 
-entry['Content||Status||alarm||@tag']='meter'
-entry['Content||Status||alarm||@min']='0'
-entry['Content||Status||alarm||@max']='1'
-entry['Content||Status||alarm||@high']='1'
+entry['Content||Status||alarm||@class']='SourcePot\Datapool\Tools\MiscTools'
+entry['Content||Status||alarm||@function']='bool2html'
+entry['Content||Status||alarm||@min']='1'
+entry['Content||Status||alarm||@max']='0'
+entry['Content||Status||alarm||@color']='red'
 entry['Content||Status||alarm||@value']='0'
+entry['Content||Status||alarm||@isSignal']='1'
 entry['Content||Status||alarm||@dataType']='bool'
 
-entry['Content||Status||escalate||@tag']='meter'
-entry['Content||Status||escalate||@min']='0'
-entry['Content||Status||escalate||@max']='1'
-entry['Content||Status||escalate||@high']='1'
+entry['Content||Status||escalate||@class']='SourcePot\Datapool\Tools\MiscTools'
+entry['Content||Status||escalate||@function']='bool2html'
+entry['Content||Status||escalate||@min']='1'
+entry['Content||Status||escalate||@max']='0'
+entry['Content||Status||escalate||@color']='blue'
 entry['Content||Status||escalate||@value']='0'
+entry['Content||Status||escalate||@isSignal']='1'
 entry['Content||Status||escalate||@dataType']='bool'
 
-entry['Content||Status||A||@tag']='meter'
-entry['Content||Status||A||@min']='0'
-entry['Content||Status||A||@max']='1'
+entry['Content||Status||A||@class']='SourcePot\Datapool\Tools\MiscTools'
+entry['Content||Status||A||@function']='bool2html'
+entry['Content||Status||A||@min']='1'
+entry['Content||Status||A||@max']='0'
+entry['Content||Status||A||@color']='blue'
 entry['Content||Status||A||@value']='0'
 entry['Content||Status||A||@dataType']='bool'
 
-entry['Content||Status||B||@tag']='meter'
-entry['Content||Status||B||@min']='0'
-entry['Content||Status||B||@max']='1'
+entry['Content||Status||B||@class']='SourcePot\Datapool\Tools\MiscTools'
+entry['Content||Status||B||@function']='bool2html'
+entry['Content||Status||B||@min']='1'
+entry['Content||Status||B||@max']='0'
+entry['Content||Status||B||@color']='blue'
 entry['Content||Status||B||@value']='0'
 entry['Content||Status||B||@dataType']='bool'
+
+entry['Content||Status||timestamp||@tag']='p'
+entry['Content||Status||timestamp||@value']='0'
+entry['Content||Status||timestamp||@dataType']='int'
+
+entry['Content||Status||cpuTemperature||@tag']='p'
+entry['Content||Status||cpuTemperature||@min']='30'
+entry['Content||Status||cpuTemperature||@max']='100'
+entry['Content||Status||cpuTemperature||@value']='0'
+entry['Content||Status||cpuTemperature||@isSignal']='1'
+entry['Content||Status||cpuTemperature||@dataType']='float'
 
 entry['Content||Status||Msg||@tag']='p'
 entry['Content||Status||Msg||@value']='Started'
@@ -208,6 +224,7 @@ def capture(filename):
         if entry['Content||Settings||mode||@value']!='idle':
             setLed('Content||Settings||light||@value',1)
         captureEntry=readInputs()
+        captureEntry['lifetime']=int(100000*activity)
         if hasPiCamera and entry['Content||Settings||mode||@value']!='idle':
             with picamera.PiCamera(framerate=2) as camera:
                 camera.start_preview()
