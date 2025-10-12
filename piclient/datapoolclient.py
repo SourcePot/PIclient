@@ -173,6 +173,8 @@ def clientRequest(payload):
     except requests.exceptions.RequestException as e:
         print(repr(e))
         return False
+    
+    #print(resp.text)
     return jsonDecode(resp.text)
 
 

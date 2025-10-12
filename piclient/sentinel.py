@@ -4,137 +4,142 @@ import time
 import pkgutil
 from threading import Timer
 
-entry={'Group':'München','Folder':'Guntherstraße 13','Name':'Wohnzimmer'}
+town='town'
+address='address'
+location='location'
+
+entry={'Settings||Group':town,'Settings||Folder':address,'Settings||Name':location,'Status||Group':town,'Status||Folder':address,'Status||Name':location}
 # settings
-entry['Content||Settings||mode||@function']='select'
-entry['Content||Settings||mode||@value']='alarm'
-entry['Content||Settings||mode||@dataType']='string'
-entry['Content||Settings||mode||@excontainer']=''
-entry['Content||Settings||mode||@options||idle']='Idle'
-entry['Content||Settings||mode||@options||capture']='Capture'
-entry['Content||Settings||mode||@options||sms']='SMS'
-entry['Content||Settings||mode||@options||alarm']='Alarm'
+entry['Settings||Content||Settings||mode||@function']='select'
+entry['Settings||Content||Settings||mode||@value']='alarm'
+entry['Settings||Content||Settings||mode||@dataType']='string'
+entry['Settings||Content||Settings||mode||@excontainer']='0'
+entry['Settings||Content||Settings||mode||@options||idle']='Idle'
+entry['Settings||Content||Settings||mode||@options||capture']='Capture'
+entry['Settings||Content||Settings||mode||@options||sms']='SMS'
+entry['Settings||Content||Settings||mode||@options||alarm']='Alarm'
 
-entry['Content||Settings||captureTime||@function']='select'
-entry['Content||Settings||captureTime||@value']='3600'
-entry['Content||Settings||captureTime||@dataType']='int'
-entry['Content||Settings||captureTime||@excontainer']='1'
-entry['Content||Settings||captureTime||@options||10']='10sec'
-entry['Content||Settings||captureTime||@options||60']='1min'
-entry['Content||Settings||captureTime||@options||600']='10min'
-entry['Content||Settings||captureTime||@options||3600']='1h'
-entry['Content||Settings||captureTime||@options||36000']='10h'
+entry['Settings||Content||Settings||captureTime||@function']='select'
+entry['Settings||Content||Settings||captureTime||@value']='3600'
+entry['Settings||Content||Settings||captureTime||@dataType']='int'
+entry['Settings||Content||Settings||captureTime||@excontainer']='0'
+entry['Settings||Content||Settings||captureTime||@options||10']='10sec'
+entry['Settings||Content||Settings||captureTime||@options||60']='1min'
+entry['Settings||Content||Settings||captureTime||@options||600']='10min'
+entry['Settings||Content||Settings||captureTime||@options||3600']='1h'
+entry['Settings||Content||Settings||captureTime||@options||36000']='10h'
 
-entry['Content||Settings||light||@function']='select'
-entry['Content||Settings||light||@value']='0'
-entry['Content||Settings||light||@dataType']='bool'
-entry['Content||Settings||light||@excontainer']='1'
-entry['Content||Settings||light||@options||0']='Off'
-entry['Content||Settings||light||@options||1']='On'
+entry['Settings||Content||Settings||light||@function']='select'
+entry['Settings||Content||Settings||light||@value']='0'
+entry['Settings||Content||Settings||light||@dataType']='bool'
+entry['Settings||Content||Settings||light||@excontainer']='0'
+entry['Settings||Content||Settings||light||@options||0']='Off'
+entry['Settings||Content||Settings||light||@options||1']='On'
 
-entry['Content||Settings||alarm||@function']='select'
-entry['Content||Settings||alarm||@value']='0'
-entry['Content||Settings||alarm||@dataType']='bool'
-entry['Content||Settings||alarm||@excontainer']='1'
-entry['Content||Settings||alarm||@options||0']='Off'
-entry['Content||Settings||alarm||@options||1']='On'
+entry['Settings||Content||Settings||alarm||@function']='select'
+entry['Settings||Content||Settings||alarm||@value']='0'
+entry['Settings||Content||Settings||alarm||@dataType']='bool'
+entry['Settings||Content||Settings||alarm||@excontainer']='0'
+entry['Settings||Content||Settings||alarm||@options||0']='Off'
+entry['Settings||Content||Settings||alarm||@options||1']='On'
 
-entry['Content||Settings||A||@function']='select'
-entry['Content||Settings||A||@value']='0'
-entry['Content||Settings||A||@dataType']='bool'
-entry['Content||Settings||A||@excontainer']='1'
-entry['Content||Settings||A||@options||0']='Off'
-entry['Content||Settings||A||@options||1']='On'
+entry['Settings||Content||Settings||A||@function']='select'
+entry['Settings||Content||Settings||A||@value']='0'
+entry['Settings||Content||Settings||A||@dataType']='bool'
+entry['Settings||Content||Settings||A||@excontainer']='0'
+entry['Settings||Content||Settings||A||@options||0']='Off'
+entry['Settings||Content||Settings||A||@options||1']='On'
 
-entry['Content||Settings||B||@function']='select'
-entry['Content||Settings||B||@value']='0'
-entry['Content||Settings||B||@dataType']='bool'
-entry['Content||Settings||B||@excontainer']='1'
-entry['Content||Settings||B||@options||0']='Off'
-entry['Content||Settings||B||@options||1']='On'
+entry['Settings||Content||Settings||B||@function']='select'
+entry['Settings||Content||Settings||B||@value']='0'
+entry['Settings||Content||Settings||B||@dataType']='bool'
+entry['Settings||Content||Settings||B||@excontainer']='0'
+entry['Settings||Content||Settings||B||@options||0']='Off'
+entry['Settings||Content||Settings||B||@options||1']='On'
 # status
-entry['Content||Status||mode||@tag']='p'
-entry['Content||Status||mode||@value']='idle'
-entry['Content||Status||mode||@dataType']='string'
+entry['Status||Content||Status||mode||@tag']='p'
+entry['Status||Content||Status||mode||@value']='idle'
+entry['Status||Content||Status||mode||@dataType']='string'
 
-entry['Content||Status||captureTime||@tag']='p'
-entry['Content||Status||captureTime||@value']='3600'
-entry['Content||Status||captureTime||@dataType']='int'
+entry['Status||Content||Status||captureTime||@tag']='p'
+entry['Status||Content||Status||captureTime||@value']='3600'
+entry['Status||Content||Status||captureTime||@dataType']='int'
 
-entry['Content||Status||activity||@tag']='meter'
-entry['Content||Status||activity||@min']='0'
-entry['Content||Status||activity||@max']='20'
-entry['Content||Status||activity||@color']='green'
-entry['Content||Status||activity||@low']='0'
-entry['Content||Status||activity||@high']='3'
-entry['Content||Status||activity||@value']='0'
-entry['Content||Status||activity||@isSignal']='1'
-entry['Content||Status||activity||@dataType']='int'
+entry['Status||Content||Status||activity||@tag']='meter'
+entry['Status||Content||Status||activity||@yMin']='0'
+entry['Status||Content||Status||activity||@yMax']='20'
+entry['Status||Content||Status||activity||@min']='0'
+entry['Status||Content||Status||activity||@max']='20'
+entry['Status||Content||Status||activity||@color']='green'
+entry['Status||Content||Status||activity||@label']='INIT'
+entry['Status||Content||Status||activity||@value']='0'
+entry['Status||Content||Status||activity||@isSignal']='1'
+entry['Status||Content||Status||activity||@dataType']='int'
 
-entry['Content||Status||light||@class']='SourcePot\Datapool\Tools\MiscTools'
-entry['Content||Status||light||@function']='bool2html'
-entry['Content||Status||light||@min']='1'
-entry['Content||Status||light||@max']='0'
-entry['Content||Status||light||@color']='blue'
-entry['Content||Status||light||@value']='0'
-entry['Content||Status||light||@isSignal']='1'
-entry['Content||Status||light||@dataType']='bool'
+entry['Status||Content||Status||escalate||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
+entry['Status||Content||Status||escalate||@function']='bool2html'
+entry['Status||Content||Status||escalate||@yMin']='1'
+entry['Status||Content||Status||escalate||@yMax']='0'
+entry['Status||Content||Status||escalate||@color']='blue'
+entry['Status||Content||Status||escalate||@value']='0'
+entry['Status||Content||Status||escalate||@isSignal']='1'
+entry['Status||Content||Status||escalate||@dataType']='bool'
 
-entry['Content||Status||alarm||@class']='SourcePot\Datapool\Tools\MiscTools'
-entry['Content||Status||alarm||@function']='bool2html'
-entry['Content||Status||alarm||@min']='1'
-entry['Content||Status||alarm||@max']='0'
-entry['Content||Status||alarm||@color']='red'
-entry['Content||Status||alarm||@value']='0'
-entry['Content||Status||alarm||@isSignal']='1'
-entry['Content||Status||alarm||@dataType']='bool'
+entry['Status||Content||Status||light||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
+entry['Status||Content||Status||light||@function']='bool2html'
+entry['Status||Content||Status||light||@yMin']='1'
+entry['Status||Content||Status||light||@yMax']='0'
+entry['Status||Content||Status||light||@color']='blue'
+entry['Status||Content||Status||light||@value']='0'
+entry['Status||Content||Status||light||@isSignal']='1'
+entry['Status||Content||Status||light||@dataType']='bool'
 
-entry['Content||Status||escalate||@class']='SourcePot\Datapool\Tools\MiscTools'
-entry['Content||Status||escalate||@function']='bool2html'
-entry['Content||Status||escalate||@min']='1'
-entry['Content||Status||escalate||@max']='0'
-entry['Content||Status||escalate||@color']='blue'
-entry['Content||Status||escalate||@value']='0'
-entry['Content||Status||escalate||@isSignal']='1'
-entry['Content||Status||escalate||@dataType']='bool'
+entry['Status||Content||Status||alarm||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
+entry['Status||Content||Status||alarm||@function']='bool2html'
+entry['Status||Content||Status||alarm||@yMin']='1'
+entry['Status||Content||Status||alarm||@yMax']='0'
+entry['Status||Content||Status||alarm||@color']='red'
+entry['Status||Content||Status||alarm||@value']='0'
+entry['Status||Content||Status||alarm||@isSignal']='1'
+entry['Status||Content||Status||alarm||@dataType']='bool'
 
-entry['Content||Status||A||@class']='SourcePot\Datapool\Tools\MiscTools'
-entry['Content||Status||A||@function']='bool2html'
-entry['Content||Status||A||@min']='1'
-entry['Content||Status||A||@max']='0'
-entry['Content||Status||A||@color']='blue'
-entry['Content||Status||A||@value']='0'
-entry['Content||Status||A||@dataType']='bool'
+entry['Status||Content||Status||A||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
+entry['Status||Content||Status||A||@function']='bool2html'
+entry['Status||Content||Status||A||@yMin']='1'
+entry['Status||Content||Status||A||@yMax']='0'
+entry['Status||Content||Status||A||@color']='blue'
+entry['Status||Content||Status||A||@value']='0'
+entry['Status||Content||Status||A||@dataType']='bool'
 
-entry['Content||Status||B||@class']='SourcePot\Datapool\Tools\MiscTools'
-entry['Content||Status||B||@function']='bool2html'
-entry['Content||Status||B||@min']='1'
-entry['Content||Status||B||@max']='0'
-entry['Content||Status||B||@color']='blue'
-entry['Content||Status||B||@value']='0'
-entry['Content||Status||B||@dataType']='bool'
+entry['Status||Content||Status||B||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
+entry['Status||Content||Status||B||@function']='bool2html'
+entry['Status||Content||Status||B||@yMin']='1'
+entry['Status||Content||Status||B||@yMax']='0'
+entry['Status||Content||Status||B||@color']='blue'
+entry['Status||Content||Status||B||@value']='0'
+entry['Status||Content||Status||B||@dataType']='bool'
 
-entry['Content||Status||timestamp||@tag']='p'
-entry['Content||Status||timestamp||@value']='0'
-entry['Content||Status||timestamp||@dataType']='int'
+entry['Status||Content||Status||timestamp||@tag']='p'
+entry['Status||Content||Status||timestamp||@value']='0'
+entry['Status||Content||Status||timestamp||@dataType']='int'
 
-entry['Content||Status||cpuTemperature||@tag']='p'
-entry['Content||Status||cpuTemperature||@min']='30'
-entry['Content||Status||cpuTemperature||@max']='100'
-entry['Content||Status||cpuTemperature||@value']='0'
-entry['Content||Status||cpuTemperature||@isSignal']='1'
-entry['Content||Status||cpuTemperature||@dataType']='float'
+entry['Status||Content||Status||cpuTemperature||@tag']='p'
+entry['Status||Content||Status||cpuTemperature||@yMin']='30'
+entry['Status||Content||Status||cpuTemperature||@yMax']='100'
+entry['Status||Content||Status||cpuTemperature||@value']='0'
+entry['Status||Content||Status||cpuTemperature||@isSignal']='1'
+entry['Status||Content||Status||cpuTemperature||@dataType']='float'
 
-entry['Content||Status||Msg||@tag']='p'
-entry['Content||Status||Msg||@value']='Started'
-entry['Content||Status||Msg||@dataType']='string'
+entry['Status||Content||Status||Msg||@tag']='p'
+entry['Status||Content||Status||Msg||@value']='Started'
+entry['Status||Content||Status||Msg||@dataType']='string'
 
 # file
-entry['Params||File||Name']=''
-entry['Params||File||Extension']=''
-entry['Params||File||MIME-Type']=''
+entry['Status||Params||File||Name']=''
+entry['Status||Params||File||Extension']=''
+entry['Status||Params||File||MIME-Type']=''
 
-strOutputs={'Content||Settings||Feedback':''}
+strOutputs={'Settings||Content||Settings||Feedback':''}
 
 dirs=datapoolclient.getDirs()
 
@@ -161,10 +166,10 @@ leds={}
 def initOutputs():
     global leds
     if hasGpioZero:
-        leds['Content||Settings||alarm||@value']=LED(17,initial_value=False)
-        leds['Content||Settings||light||@value']=LED(18,initial_value=False)
-        leds['Content||Settings||A||@value']=LED(22,initial_value=False)
-        leds['Content||Settings||B||@value']=LED(23,initial_value=False)
+        leds['Settings||Content||Settings||alarm||@value']=LED(17,initial_value=False)
+        leds['Settings||Content||Settings||light||@value']=LED(18,initial_value=False)
+        leds['Settings||Content||Settings||A||@value']=LED(22,initial_value=False)
+        leds['Settings||Content||Settings||B||@value']=LED(23,initial_value=False)
 
 initOutputs()
 
@@ -173,7 +178,6 @@ def writeOutputs(response):
     if type(response) is not bool:
         for key,value in response.items():
             if '||Settings||' in key:
-                key=key+'||@value'
                 if key in entry:
                     setEntry(key,value)
                 if key in leds:
@@ -194,17 +198,17 @@ def setLed(key,value):
 # ===================================== Sensors ===================================
 def readLeds():
     for key in leds:
-        entryKey=key.replace('||Settings||','||Status||')
+        entryKey=key.replace('Settings||','Status||')
         setEntry(entryKey,leds[key].is_active)
 
 def readInputs():
     readLeds()
     setEntry('Date',time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()))
-    setEntry('Content||Status||timestamp||@value',time.time())
-    setEntry('Content||Status||mode||@value',entry['Content||Settings||mode||@value'])
-    setEntry('Content||Status||captureTime||@value',entry['Content||Settings||captureTime||@value'])
+    setEntry('Status||Content||Status||timestamp||@value',time.time())
+    setEntry('Status||Content||Status||mode||@value',entry['Settings||Content||Settings||mode||@value'])
+    setEntry('Status||Content||Status||captureTime||@value',entry['Settings||Content||Settings||captureTime||@value'])
     if hasGpioZero:
-        setEntry('Content||Status||cpuTemperature||@value',CPUTemperature().temperature)
+        setEntry('Status||Content||Status||cpuTemperature||@value',CPUTemperature().temperature)
     return dict(entry)
 
 # ===================================== Behaviour =================================
@@ -217,45 +221,66 @@ def captureFileNames(filename):
 
 busyCapturing=False
 
-def capture(filename):
+def capture(filename,activityType):
     global busyCapturing
+    # Update activity
+    if (activityType=='capture'):
+        addActivity(0,activityType)
+    elif (activityType=='statusPolling'):
+        addActivity(-1,activityType)
+    else:
+        addActivity(2,activityType)
     if busyCapturing==False:
         busyCapturing=True
-        if entry['Content||Settings||mode||@value']!='idle':
-            setLed('Content||Settings||light||@value',1)
+        activateCamera=entry['Settings||Content||Settings||mode||@value']!='idle' and activityType!='statusPolling'
+        # Activate light
+        if activateCamera:
+            setLed('Settings||Content||Settings||light||@value',1)
+        # Prepare capture entry
         captureEntry=readInputs()
         captureEntry['lifetime']=int(100000*activity)
-        if hasPiCamera and entry['Content||Settings||mode||@value']!='idle':
+        if (hasPiCamera and activateCamera):
+            # Capture images + status
+            captureEntry['Tag']='media'
             with picamera.PiCamera(framerate=2) as camera:
                 camera.start_preview()
                 time.sleep(1)
                 camera.capture_sequence(captureFileNames(filename),use_video_port=False,resize=None)
                 mediaItems2stack(captureEntry)
-        if (int(entry['Content||Settings||light||@value'])==1):
-            setLed('Content||Settings||light||@value',1)
         else:
-            setLed('Content||Settings||light||@value',0)
+            # Capture status only
+            captureEntry['Tag']='status'
+            datapoolclient.add2stack(captureEntry)
+        # Reset light
+        if (int(entry['Settings||Content||Settings||light||@value'])==1):
+            setLed('Settings||Content||Settings||light||@value',1)
+        else:
+            setLed('Settings||Content||Settings||light||@value',0)
         busyCapturing=False
     else:
         print('Too busy, skipped capturing')
  
 def motionA():
-    addActivity(4)
-    if entry['Content||Settings||mode||@value']=='alarm':
-        setLed('Content||Settings||alarm||@value',1)
-        setEntry('Content||Status||escalate||@value',1)
-    elif entry['Content||Settings||mode||@value']=='sms':
-        setEntry('Content||Status||escalate||@value',1)
-    capture('motionA')
-    setEntry('Content||Status||escalate||@value',0)
-    if (int(entry['Content||Settings||alarm||@value'])==1):
-        setLed('Content||Settings||alarm||@value',1)
+    activityType='motion';
+    if entry['Settings||Content||Settings||mode||@value']=='alarm':
+        setLed('Settings||Content||Settings||alarm||@value',1)
+        setEntry('Status||Content||Status||escalate||@value',1)
+        activityType='alarm';
+    elif entry['Settings||Content||Settings||mode||@value']=='sms':
+        setEntry('Status||Content||Status||escalate||@value',1)
+        activityType='sms';
     else:
-        setLed('Content||Settings||alarm||@value',0)
+        activityType='motion'
+    capture('motionA',activityType)
+    setEntry('Status||Content||Status||escalate||@value',0)
+    if (int(entry['Settings||Content||Settings||alarm||@value'])==1):
+        setLed('Settings||Content||Settings||alarm||@value',1)
+    else:
+        setLed('Settings||Content||Settings||alarm||@value',0)
     
 def motionB():
     print('Motion B')
-    addActivity(1)
+    addActivity(1,'motion')
 
 if hasGpioZero:
     pirA=MotionSensor(27)
@@ -267,44 +292,45 @@ print('Client initialized')
 
 activity=0
 
-def addActivity(add):
+def addActivity(add,label):
     global activity
-    if (add>0):
-        activity=activity+add
-    elif (activity>0):
-        activity=activity+add
+    activity=activity+add
+    if (activity<1):
+        activity=1
+    setEntry('Status||Content||Status||activity||@value',activity)
+    setEntry('Status||Content||Status||activity||@label',label)
+    setEntry('Status||Content||Status||activity||@isSignal','1')
+    if (label=='capture'):
+        setEntry('Status||Content||Status||activity||@color','#03f')
+    elif (label=='motion'):
+        setEntry('Status||Content||Status||activity||@color','#3d0')
+    elif (label=='sms'):
+        setEntry('Status||Content||Status||activity||@color','#f80')
+    elif (label=='alarm'):
+        setEntry('Status||Content||Status||activity||@color','#f00')
     else:
-        activity=0
-    setEntry('Content||Status||activity||@value',activity)
-
-def updateActivityTimer():
-    addActivity(-1)
-    t=Timer(6,updateActivityTimer)
-    t.start()
-updateActivityTimer()
+        setEntry('Status||Content||Status||activity||@isSignal','0')
+        setEntry('Status||Content||Status||activity||@color','#efe')
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
 def mediaItems2stack(captureEntry):
     for file in os.listdir(dirs['media']):
-        captureEntry['Tag']='media'
         fileNameComps=file.split('_')
         if (len(fileNameComps)==3):
-            captureEntry['Content||Status||timestamp||@value']=fileNameComps[1]
-            captureEntry['Params||File||Name']=file
-            captureEntry['Params||File||Extension']='jpeg'
-            captureEntry['Params||File||MIME-Type']='image/jpeg'
+            captureEntry['Status||Content||Status||timestamp||@value']=fileNameComps[1]
+            captureEntry['Status||Params||File||Name']=file
+            captureEntry['Status||Params||File||Extension']='jpeg'
+            captureEntry['Status||Params||File||MIME-Type']='image/jpeg'
         else:
-            captureEntry['Params||File||Name']=''
-            captureEntry['Params||File||Extension']=''
-            captureEntry['Params||File||MIME-Type']=''
+            captureEntry['Status||Params||File||Name']=''
+            captureEntry['Status||Params||File||Extension']=''
+            captureEntry['Status||Params||File||MIME-Type']=''
         datapoolclient.add2stack(captureEntry,dirs['media']+'/'+file)
-        setEntry('Content||Status||Msg||@value','')
+        setEntry('Status||Content||Status||Msg||@value','')
     
 def statusPolling():
-    captureEntry=readInputs()
-    captureEntry['Tag']='status'
-    datapoolclient.add2stack(captureEntry)
+    capture('dummy','statusPolling')
     t=Timer(4.7,statusPolling)
     t.start()
 statusPolling()
@@ -312,6 +338,7 @@ statusPolling()
 def stackProcessingLoop():
     answer=datapoolclient.processStack()
     #print(datapoolclient.response)
+    #print(answer)
     if type(answer) is bool:
         if answer==True:
             # Stack is empty
@@ -331,10 +358,10 @@ stackProcessingLoop()
 ticks=0
 def periodicCapture():
     global ticks
-    captureTime=int(entry['Content||Settings||captureTime||@value'])
+    captureTime=int(entry['Settings||Content||Settings||captureTime||@value'])
     if (captureTime!=0):
         if (ticks % captureTime==0):
-            capture('capture')
+            capture('capture','capture')
     ticks+=1
     t=Timer(1.0,periodicCapture)
     t.start()
