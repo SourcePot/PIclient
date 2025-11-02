@@ -10,7 +10,7 @@ The typical application is a motion sensor triggered camera. Here are some examp
 
 ## How does it work?
 
-The class `SourcePot\Datapool\Foundation\ClientAccess`, method `request` receives requests from e.g. multiple Raspberry Pis which invoke the webpage `../resource.php` from time to time. The processing of these requests require the client to be registered  with a Datapool user account. If the registered scope is `SourcePot\Datapool\Processing\RemoteClient` and method is set to `clientCall`, the class `RemoteClient` receives the requests containing data (status information, sensory data) and/or files (images, videos) e.g. of a Raspberry Pi. The web application's answer to each request contains the settings for the respective Raspberry Pi.
+The class `SourcePot\Datapool\Foundation\ClientAccess`, method `request` receives requests from e.g. multiple Raspberry Pis. These requests are facilitated by regularly calling up the website `../resource.php`. The further processing of these requests require the client to be registered with a Datapool user account. If the registered scope is `SourcePot\Datapool\Processing\RemoteClient` and the method is set to `clientCall`, the class `RemoteClient` will receive the requests containing data (status information, sensory data) and/or files (images, videos) e.g. of a Raspberry Pi. The web application's answer to each request contains the settings for the respective Raspberry Pi.
 
 ## First steps on the side of the Raspberry Pi
 To setup the Raspberry Pi client you need to create a folder on your Raspberry Pi and copy the following three python files into this folder: 
