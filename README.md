@@ -56,14 +56,14 @@ The RemoteClient processor provides an user interface which is actually defined 
 In this example, the operating system of the Raspberry Pi is Debian Trixie. The directory containing the Python files of the Pi client is `/home/carsten/Pi/`.
 First, a new service for `systemd` is created, which executes the file `sentinel.py` every time the system boots, which then runs in an infinite loop.
 
-``
+```
 sudo -i
 cd /etc/systemd/system/
 nano pi.service
-``
+```
 The last command opens a new file `pi.service` in the editor, to which the following content is now added:
 
-``
+```
 [Unit]
 Description=This service starts the RaspberryPi Sentinel
 After=network.target
@@ -76,21 +76,21 @@ User=carsten
 
 [Install]
 WantedBy=multi-user.target
-``
+```
 The following commands are used to adjust the access rights:
 
-``
+```
 sudo chmod 744 /home/carsten/Pi/sentinel.py
 sudo chmod 664 /etc/systemd/system/pi.service
-``
+```
 Finally, the new service `pi.service` must be activated:
 
-``
+```
 sudo systemctl daemon-reload
 sudo systemctl enable pi.service
-``
+```
 The next time the system starts up, `pi.service` will be executed and this will start the Python script `sentinel.py`. To test whether the service was executed correctly or whether there were any errors, the status can be checked as follows:
 
-``
+```
 sudo systemctl status pi.service
-``
+```
