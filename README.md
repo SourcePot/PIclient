@@ -20,6 +20,7 @@ To setup the Raspberry Pi client you need to create a folder on your Raspberry P
 
 You will need to adjust the url in datapoolclient.py to the web address of __your__ Datapool web application:
 ![URL setting within datapoolclient.py](/assets/img/url.png "URL setting within datapoolclient.py")
+Alternatively, the address of the website can be specified in the file `client.json` mentioned later.
 
 When sentinel.py runs for the first time, datapoolclient.py will create a set of sub-directories. You will need to adjust the client.json file in the newly created settings sub-directory.
 
@@ -50,3 +51,46 @@ Initially the client needs to request a new access token. Aften having received 
 The RemoteClient processor provides an user interface which is actually defined by the Python code of the remote client itself. Within the `sentinel.py` file the Python dictionary `entry`, key `Content||Settings||...` defines the control elements and `entry` key `Content||Status||...` the status elements (display). This allows each remote client to provide different functionalities and to specify its' specific control elements (buttons, drop-down menus, slider etc.) for the Datapool web application.
 
 ![Raspberry Pi client registration](/assets/img/remote-client.png "User Interface on a data app")
+
+# Automatic start of the Pi Client on a Raspberry Pi
+In this example, the operating system of the Raspberry Pi is Debian Trixie. The directory containing the Python files of the Pi client is `/home/carsten/Pi/`.
+First, a new service for `systemd` is created, which executes the file `sentinel.py` every time the system boots, which then runs in an infinite loop.
+
+``
+sudo -i
+cd /etc/systemd/system/
+nano pi.service
+``
+The last command opens a new file `pi.service` in the editor, to which the following content is now added:
+
+``
+[Unit]
+Description=This service starts the RaspberryPi Sentinel
+After=network.target
+
+[Service]
+ExecStart=/bin/bash -c 'python3 -u /home/carsten/Pi/sentinel.py'
+WorkingDirectory=/home/carsten/Pi/
+Restart=always
+User=carsten
+
+[Install]
+WantedBy=multi-user.target
+``
+The following commands are used to adjust the access rights:
+
+``
+sudo chmod 744 /home/carsten/Pi/sentinel.py
+sudo chmod 664 /etc/systemd/system/pi.service
+``
+Finally, the new service `pi.service` must be activated:
+
+``
+sudo systemctl daemon-reload
+sudo systemctl enable pi.service
+``
+The next time the system starts up, `pi.service` will be executed and this will start the Python script `sentinel.py`. To test whether the service was executed correctly or whether there were any errors, the status can be checked as follows:
+
+``
+sudo systemctl status pi.service
+``
