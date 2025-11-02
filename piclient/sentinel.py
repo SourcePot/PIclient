@@ -3,21 +3,26 @@ import os
 import time
 import pkgutil
 from threading import Timer
+from picamera2 import Picamera2,Preview
+from picamera2.encoders import H264Encoder
+from picamera2.outputs import FfmpegOutput
+from gpiozero import MotionSensor,CPUTemperature,LED
 
-town='town'
-address='address'
-location='location'
+town='Town'
+address='Street'
+location='Room'
 
 entry={'Settings||Group':town,'Settings||Folder':address,'Settings||Name':location,'Status||Group':town,'Status||Folder':address,'Status||Name':location}
 # settings
 entry['Settings||Content||Settings||mode||@function']='select'
-entry['Settings||Content||Settings||mode||@value']='alarm'
+entry['Settings||Content||Settings||mode||@value']='sms'
 entry['Settings||Content||Settings||mode||@dataType']='string'
 entry['Settings||Content||Settings||mode||@excontainer']='0'
 entry['Settings||Content||Settings||mode||@options||idle']='Idle'
 entry['Settings||Content||Settings||mode||@options||capture']='Capture'
 entry['Settings||Content||Settings||mode||@options||sms']='SMS'
 entry['Settings||Content||Settings||mode||@options||alarm']='Alarm'
+entry['Settings||Content||Settings||mode||@options||video']='Video'
 
 entry['Settings||Content||Settings||captureTime||@function']='select'
 entry['Settings||Content||Settings||captureTime||@value']='3600'
@@ -142,16 +147,6 @@ entry['Status||Params||File||MIME-Type']=''
 strOutputs={'Settings||Content||Settings||Feedback':''}
 
 dirs=datapoolclient.getDirs()
-
-hasPiCamera=pkgutil.find_loader('picamera')
-if hasPiCamera:
-    import picamera
-
-hasGpioZero=pkgutil.find_loader('gpiozero')
-if hasGpioZero:
-    from gpiozero import MotionSensor,CPUTemperature,LED
-else:
-    print('Problem: gpiozero missing')
     
 # ===================================== Outputs ===================================
 def setEntry(key,value):
@@ -165,11 +160,10 @@ leds={}
 
 def initOutputs():
     global leds
-    if hasGpioZero:
-        leds['Settings||Content||Settings||alarm||@value']=LED(17,initial_value=False)
-        leds['Settings||Content||Settings||light||@value']=LED(18,initial_value=False)
-        leds['Settings||Content||Settings||A||@value']=LED(22,initial_value=False)
-        leds['Settings||Content||Settings||B||@value']=LED(23,initial_value=False)
+    leds['Settings||Content||Settings||alarm||@value']=LED(17,initial_value=False)
+    leds['Settings||Content||Settings||light||@value']=LED(18,initial_value=False)
+    leds['Settings||Content||Settings||A||@value']=LED(22,initial_value=False)
+    leds['Settings||Content||Settings||B||@value']=LED(23,initial_value=False)
 
 initOutputs()
 
@@ -196,6 +190,8 @@ def setLed(key,value):
             pass
 
 # ===================================== Sensors ===================================
+camera=Picamera2()
+
 def readLeds():
     for key in leds:
         entryKey=key.replace('Settings||','Status||')
@@ -204,20 +200,13 @@ def readLeds():
 def readInputs():
     readLeds()
     setEntry('Date',time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()))
-    setEntry('Status||Content||Status||timestamp||@value',time.time())
+    setEntry('Status||Content||Status||timestamp||@value',int(time.time()))
     setEntry('Status||Content||Status||mode||@value',entry['Settings||Content||Settings||mode||@value'])
     setEntry('Status||Content||Status||captureTime||@value',entry['Settings||Content||Settings||captureTime||@value'])
-    if hasGpioZero:
-        setEntry('Status||Content||Status||cpuTemperature||@value',CPUTemperature().temperature)
+    setEntry('Status||Content||Status||cpuTemperature||@value',CPUTemperature().temperature)
     return dict(entry)
 
 # ===================================== Behaviour =================================
-
-def captureFileNames(filename):
-    frame=0
-    while frame<4:
-        yield dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_'+str(frame)+'.jpg'
-        frame+=1
 
 busyCapturing=False
 
@@ -234,28 +223,47 @@ def capture(filename,activityType):
         busyCapturing=True
         activateCamera=entry['Settings||Content||Settings||mode||@value']!='idle' and activityType!='statusPolling'
         # Activate light
-        if activateCamera:
+        if activateCamera and entry['Settings||Content||Settings||mode||@value']!='capture' and entry['Settings||Content||Settings||mode||@value']!='video':
             setLed('Settings||Content||Settings||light||@value',1)
         # Prepare capture entry
         captureEntry=readInputs()
-        captureEntry['lifetime']=int(100000*activity)
-        if (hasPiCamera and activateCamera):
-            # Capture images + status
+        if (activateCamera):
+            # set entry lifetime
+            if entry['Settings||Content||Settings||mode||@value']=='sms':
+                captureEntry['lifetime']=6048000
+            elif entry['Settings||Content||Settings||mode||@value']=='alarm':
+                captureEntry['lifetime']=31536000
+            elif entry['Settings||Content||Settings||mode||@value']=='video':
+                captureEntry['lifetime']=304800
+            else:
+                captureEntry['lifetime']=604800    
+            # Capture images/video + status
             captureEntry['Tag']='media'
-            with picamera.PiCamera(framerate=2) as camera:
-                camera.start_preview()
+            # set camera
+            if entry['Settings||Content||Settings||mode||@value']=='video':
+                config=camera.create_video_configuration()
+                camera.configure(config)
+                encoder=H264Encoder(10000000)
+                output=FfmpegOutput(dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_1.mp4',audio=False)
+                camera.start_recording(encoder,output)
+                time.sleep(5)
+                camera.stop_recording()
+            else:
+                config=camera.create_still_configuration(main={"size":(1280,720)})
+                camera.configure(config)
+                camera.start(show_preview=False)
                 time.sleep(1)
-                camera.capture_sequence(captureFileNames(filename),use_video_port=False,resize=None)
+                camera.capture_file(dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_1.jpg')
                 mediaItems2stack(captureEntry)
+                time.sleep(1)
+                camera.capture_file(dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_2.jpg')
+            # wrap-up
+            camera.stop()
+            mediaItems2stack(captureEntry)
         else:
             # Capture status only
             captureEntry['Tag']='status'
             datapoolclient.add2stack(captureEntry)
-        # Reset light
-        if (int(entry['Settings||Content||Settings||light||@value'])==1):
-            setLed('Settings||Content||Settings||light||@value',1)
-        else:
-            setLed('Settings||Content||Settings||light||@value',0)
         busyCapturing=False
     else:
         print('Too busy, skipped capturing')
@@ -273,20 +281,25 @@ def motionA():
         activityType='motion'
     capture('motionA',activityType)
     setEntry('Status||Content||Status||escalate||@value',0)
+    # reset alarm
     if (int(entry['Settings||Content||Settings||alarm||@value'])==1):
         setLed('Settings||Content||Settings||alarm||@value',1)
     else:
         setLed('Settings||Content||Settings||alarm||@value',0)
+    # reset light
+    if (int(entry['Settings||Content||Settings||light||@value'])==1):
+        setLed('Settings||Content||Settings||light||@value',1)
+    else:
+        setLed('Settings||Content||Settings||light||@value',0)
     
 def motionB():
     print('Motion B')
     addActivity(1,'motion')
 
-if hasGpioZero:
-    pirA=MotionSensor(27)
-    pirA.when_motion=motionA
-    pirB=MotionSensor(4)
-    pirB=when_motion=motionB
+pirA=MotionSensor(27)
+pirA.when_motion=motionA
+pirB=MotionSensor(4)
+pirB=when_motion=motionB
 
 print('Client initialized')
 
@@ -320,8 +333,12 @@ def mediaItems2stack(captureEntry):
         if (len(fileNameComps)==3):
             captureEntry['Status||Content||Status||timestamp||@value']=fileNameComps[1]
             captureEntry['Status||Params||File||Name']=file
-            captureEntry['Status||Params||File||Extension']='jpeg'
-            captureEntry['Status||Params||File||MIME-Type']='image/jpeg'
+            if "jpg" in file:
+                captureEntry['Status||Params||File||Extension']='jpg'
+                captureEntry['Status||Params||File||MIME-Type']='image/jpeg'
+            elif "mp4" in file:
+                captureEntry['Status||Params||File||Extension']='mp4'
+                captureEntry['Status||Params||File||MIME-Type']='video/mp4'    
         else:
             captureEntry['Status||Params||File||Name']=''
             captureEntry['Status||Params||File||Extension']=''
@@ -331,7 +348,7 @@ def mediaItems2stack(captureEntry):
     
 def statusPolling():
     capture('dummy','statusPolling')
-    t=Timer(4.7,statusPolling)
+    t=Timer(4.9,statusPolling)
     t.start()
 statusPolling()
 
@@ -350,7 +367,7 @@ def stackProcessingLoop():
     else:
         # Normal stack processing
         writeOutputs(datapoolclient.response)
-        t=Timer(1.9,stackProcessingLoop)
+        t=Timer(1.4,stackProcessingLoop)
     t.start()
 stackProcessingLoop()
 
@@ -360,7 +377,7 @@ def periodicCapture():
     global ticks
     captureTime=int(entry['Settings||Content||Settings||captureTime||@value'])
     if (captureTime!=0):
-        if (ticks % captureTime==0):
+        if (ticks % captureTime==0 and entry['Settings||Content||Settings||mode||@value']!='idle'):
             capture('capture','capture')
     ticks+=1
     t=Timer(1.0,periodicCapture)
