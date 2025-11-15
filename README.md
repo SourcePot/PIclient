@@ -69,7 +69,7 @@ Description=This service starts the RaspberryPi Sentinel
 After=network.target
 
 [Service]
-ExecStart=/bin/bash -c 'python3 -u /home/carsten/Pi/sentinel.py'
+ExecStart=/usr/bin/python3 /home/carsten/Pi/sentinel.py
 WorkingDirectory=/home/carsten/Pi/
 Restart=always
 User=carsten
