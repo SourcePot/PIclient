@@ -9,8 +9,8 @@ from picamera2.outputs import FfmpegOutput
 from gpiozero import MotionSensor,CPUTemperature,LED
 
 town='Town'
-address='Street'
-location='Room'
+address='Address'
+location='Location'
 
 entry={'Settings||Group':town,'Settings||Folder':address,'Settings||Name':location,'Status||Group':town,'Status||Folder':address,'Status||Name':location}
 # settings
@@ -80,6 +80,17 @@ entry['Status||Content||Status||activity||@label']='INIT'
 entry['Status||Content||Status||activity||@value']='0'
 entry['Status||Content||Status||activity||@isSignal']='1'
 entry['Status||Content||Status||activity||@dataType']='int'
+
+entry['Status||Content||Status||activityB||@tag']='meter'
+entry['Status||Content||Status||activityB||@yMin']='0'
+entry['Status||Content||Status||activityB||@yMax']='20'
+entry['Status||Content||Status||activityB||@min']='0'
+entry['Status||Content||Status||activityB||@max']='20'
+entry['Status||Content||Status||activityB||@color']='blue'
+entry['Status||Content||Status||activityB||@label']='INIT'
+entry['Status||Content||Status||activityB||@value']='0'
+entry['Status||Content||Status||activityB||@isSignal']='1'
+entry['Status||Content||Status||activityB||@dataType']='int'
 
 entry['Status||Content||Status||escalate||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
 entry['Status||Content||Status||escalate||@function']='bool2html'
@@ -210,18 +221,11 @@ def readInputs():
 
 busyCapturing=False
 
-def capture(filename,activityType):
+def capture(filename):
     global busyCapturing
-    # Update activity
-    if (activityType=='capture'):
-        addActivity(0,activityType)
-    elif (activityType=='statusPolling'):
-        addActivity(-1,activityType)
-    else:
-        addActivity(2,activityType)
     if busyCapturing==False:
         busyCapturing=True
-        activateCamera=entry['Settings||Content||Settings||mode||@value']!='idle' and activityType!='statusPolling'
+        activateCamera=entry['Settings||Content||Settings||mode||@value']!='idle'
         # Activate light
         if activateCamera and entry['Settings||Content||Settings||mode||@value']!='capture' and entry['Settings||Content||Settings||mode||@value']!='video':
             setLed('Settings||Content||Settings||light||@value',1)
@@ -269,7 +273,7 @@ def capture(filename,activityType):
         print('Too busy, skipped capturing')
  
 def motionA():
-    activityType='motion';
+    #print('Motion A')
     if entry['Settings||Content||Settings||mode||@value']=='alarm':
         setLed('Settings||Content||Settings||alarm||@value',1)
         setEntry('Status||Content||Status||escalate||@value',1)
@@ -279,7 +283,8 @@ def motionA():
         activityType='sms';
     else:
         activityType='motion'
-    capture('motionA',activityType)
+    addActivity(2,activityType)
+    capture('motionA')
     setEntry('Status||Content||Status||escalate||@value',0)
     # reset alarm
     if (int(entry['Settings||Content||Settings||alarm||@value'])==1):
@@ -293,26 +298,24 @@ def motionA():
         setLed('Settings||Content||Settings||light||@value',0)
     
 def motionB():
-    print('Motion B')
-    addActivity(1,'motion')
+    #print('Motion B')
+    addActivityB(2,'motion')
 
 pirA=MotionSensor(27)
 pirA.when_motion=motionA
-pirB=MotionSensor(4)
-pirB=when_motion=motionB
+pirB=MotionSensor(24)
+pirB.when_motion=motionB
 
 print('Client initialized')
 
 activity=0
-
 def addActivity(add,label):
     global activity
     activity=activity+add
-    if (activity<1):
-        activity=1
+    if (activity<0):
+        activity=0
     setEntry('Status||Content||Status||activity||@value',activity)
     setEntry('Status||Content||Status||activity||@label',label)
-    setEntry('Status||Content||Status||activity||@isSignal','1')
     if (label=='capture'):
         setEntry('Status||Content||Status||activity||@color','#03f')
     elif (label=='motion'):
@@ -322,8 +325,17 @@ def addActivity(add,label):
     elif (label=='alarm'):
         setEntry('Status||Content||Status||activity||@color','#f00')
     else:
-        setEntry('Status||Content||Status||activity||@isSignal','0')
         setEntry('Status||Content||Status||activity||@color','#efe')
+
+activityB=0
+def addActivityB(add,label):
+    global activityB
+    activityB=activityB+add
+    if (activityB<0):
+        activityB=0
+    setEntry('Status||Content||Status||activityB||@value',activityB)
+    setEntry('Status||Content||Status||activityB||@label',label)
+    setEntry('Status||Content||Status||activity||@color','#03f')
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
@@ -347,7 +359,17 @@ def mediaItems2stack(captureEntry):
         setEntry('Status||Content||Status||Msg||@value','')
     
 def statusPolling():
-    capture('dummy','statusPolling')
+    addActivity(-1,'polling')
+    addActivityB(-1,'polling')
+    if busyCapturing==False:
+        setEntry('Status||Content||Status||activity||@isSignal','0')
+        setEntry('Status||Content||Status||activityB||@isSignal','1')
+        captureEntry=readInputs()
+        captureEntry['Tag']='status'
+        captureEntry['lifetime']=300
+        datapoolclient.add2stack(captureEntry)
+        setEntry('Status||Content||Status||activity||@isSignal','1')
+        setEntry('Status||Content||Status||activityB||@isSignal','1')
     t=Timer(4.9,statusPolling)
     t.start()
 statusPolling()
@@ -378,7 +400,8 @@ def periodicCapture():
     captureTime=int(entry['Settings||Content||Settings||captureTime||@value'])
     if (captureTime!=0):
         if (ticks % captureTime==0 and entry['Settings||Content||Settings||mode||@value']!='idle'):
-            capture('capture','capture')
+            addActivity(0,'capture')
+            capture('capture')
     ticks+=1
     t=Timer(1.0,periodicCapture)
     t.start()
