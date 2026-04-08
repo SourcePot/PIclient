@@ -47,7 +47,7 @@ When a Raspberry Pi connects for the very first time to the Datapool host a data
 
 Initially the client needs to request a new access token. Aften having received the access token, the client can send client (status) data such as measurements, senosor data and optionally media files such as images or movies (POST request). The Datapool host answers the host request with new settings data for the client.
 
-## Example view on the Datapool web application
+## Example view of the Datapool web application
 The RemoteClient processor provides an user interface which is actually defined by the Python code of the remote client itself. Within the `sentinel.py` file the Python dictionary `entry`, key `Content||Settings||...` defines the control elements and `entry` key `Content||Status||...` the status elements (display). This allows each remote client to provide different functionalities and to specify its' specific control elements (buttons, drop-down menus, slider etc.) for the Datapool web application.
 
 ![Raspberry Pi client registration](/assets/img/remote-client.png "User Interface on a data app")
