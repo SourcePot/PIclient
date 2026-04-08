@@ -2,7 +2,9 @@
 The Python code of this repository is for a Raspberry Pi. It enables the Raspberry Pi to connect to the Datapool web application.
 It connects to the web application via the Datapool processor `SourcePot\Datapool\Processing\RemoteClient` and it can be used within any data app.
 
-The typical application is a motion sensor triggered camera. Here are some examples:
+The typical application is a motion sensor triggered camera. 
+
+Here are a few examples, first Mr. Fox and second myself:
 
 ![Raspberry Pi Client Mr Fox shot](/assets/img/mr_fox.jpg "Mr Fox")
 
