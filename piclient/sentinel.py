@@ -1,18 +1,68 @@
-import datapoolclient
+# Pi location
+TOWN='E.g. enter the town here...'
+ADDRESS='E.g. enter the house o and street here....'
+LOCATION='E.g. enter the building here...'
+
+GEO={'lat':'***','lon':'***'}
+
 import os
 import time
-import pkgutil
 from threading import Timer
-from picamera2 import Picamera2,Preview
-from picamera2.encoders import H264Encoder
-from picamera2.outputs import FfmpegOutput
-from gpiozero import MotionSensor,CPUTemperature,LED
+import datapoolclient
 
-town='Town'
-address='Address'
-location='Location'
+# I2C Bus Library, see https://pypi.org/project/smbus2/
+try:
+    import smbus2
+    i2cBusOk=True
+except ImportError:
+    i2cBusOk=False
+    datapoolclient.addLog({'warning':'Module smbus2 missing'})
+    
+# bme280 Sensor Library, see https://pypi.org/project/bme280/
+try:
+    import bme280
+    bme280Ok=i2cBusOk
+except ImportError:
+    bme280Ok=False
+    datapoolclient.addLog({'warning':'Module bme280 missing'})
 
-entry={'Settings||Group':town,'Settings||Folder':address,'Settings||Name':location,'Status||Group':town,'Status||Folder':address,'Status||Name':location}
+# Camera Library, see https://pypi.org/project/picamera2/
+try:
+    from picamera2 import Picamera2
+    from picamera2.encoders import H264Encoder
+    from picamera2.outputs import FfmpegOutput
+    cameraOk=True
+except ImportError:
+    print('Module picamera2 missing, exiting')
+    cameraOk=False
+
+# GPIO library, see https://pypi.org/project/gpiozero/
+try:
+    from gpiozero import MotionSensor,CPUTemperature,LED
+except ImportError:
+    print('Module gpiozero missing, exiting')
+    exit(1)
+
+print('Imports done')
+
+if i2cBusOk==True:
+    # BME280 sensor ADDRESS (default ADDRESS)
+    I2C_ADDRESS = 0x76
+    # Initialize I2C bus
+    try:
+        bus = smbus2.SMBus(1)
+    except FileNotFoundError:
+        print('SMBus file not found')
+        i2cBusOk=False
+        bme280Ok=False
+
+if bme280Ok==True:
+    # Load calibration parameters
+    calibration_params = bme280.load_calibration_params(bus, I2C_ADDRESS)
+
+# ========== Entry template consisting of the selector fields, settings and status fields ==========
+# selector
+entry={'Settings||Group':TOWN,'Settings||Folder':ADDRESS,'Settings||Name':LOCATION,'Status||Group':TOWN,'Status||Folder':ADDRESS,'Status||Name':LOCATION}
 # settings
 entry['Settings||Content||Settings||mode||@function']='select'
 entry['Settings||Content||Settings||mode||@value']='sms'
@@ -48,19 +98,6 @@ entry['Settings||Content||Settings||alarm||@excontainer']='0'
 entry['Settings||Content||Settings||alarm||@options||0']='Off'
 entry['Settings||Content||Settings||alarm||@options||1']='On'
 
-entry['Settings||Content||Settings||A||@function']='select'
-entry['Settings||Content||Settings||A||@value']='0'
-entry['Settings||Content||Settings||A||@dataType']='bool'
-entry['Settings||Content||Settings||A||@excontainer']='0'
-entry['Settings||Content||Settings||A||@options||0']='Off'
-entry['Settings||Content||Settings||A||@options||1']='On'
-
-entry['Settings||Content||Settings||B||@function']='select'
-entry['Settings||Content||Settings||B||@value']='0'
-entry['Settings||Content||Settings||B||@dataType']='bool'
-entry['Settings||Content||Settings||B||@excontainer']='0'
-entry['Settings||Content||Settings||B||@options||0']='Off'
-entry['Settings||Content||Settings||B||@options||1']='On'
 # status
 entry['Status||Content||Status||mode||@tag']='p'
 entry['Status||Content||Status||mode||@value']='idle'
@@ -71,10 +108,6 @@ entry['Status||Content||Status||captureTime||@value']='3600'
 entry['Status||Content||Status||captureTime||@dataType']='int'
 
 entry['Status||Content||Status||activity||@tag']='meter'
-entry['Status||Content||Status||activity||@yMin']='0'
-entry['Status||Content||Status||activity||@yMax']='20'
-entry['Status||Content||Status||activity||@min']='0'
-entry['Status||Content||Status||activity||@max']='20'
 entry['Status||Content||Status||activity||@color']='green'
 entry['Status||Content||Status||activity||@label']='INIT'
 entry['Status||Content||Status||activity||@value']='0'
@@ -82,10 +115,6 @@ entry['Status||Content||Status||activity||@isSignal']='1'
 entry['Status||Content||Status||activity||@dataType']='int'
 
 entry['Status||Content||Status||activityB||@tag']='meter'
-entry['Status||Content||Status||activityB||@yMin']='0'
-entry['Status||Content||Status||activityB||@yMax']='20'
-entry['Status||Content||Status||activityB||@min']='0'
-entry['Status||Content||Status||activityB||@max']='20'
 entry['Status||Content||Status||activityB||@color']='blue'
 entry['Status||Content||Status||activityB||@label']='INIT'
 entry['Status||Content||Status||activityB||@value']='0'
@@ -119,32 +148,42 @@ entry['Status||Content||Status||alarm||@value']='0'
 entry['Status||Content||Status||alarm||@isSignal']='1'
 entry['Status||Content||Status||alarm||@dataType']='bool'
 
-entry['Status||Content||Status||A||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
-entry['Status||Content||Status||A||@function']='bool2html'
-entry['Status||Content||Status||A||@yMin']='1'
-entry['Status||Content||Status||A||@yMax']='0'
-entry['Status||Content||Status||A||@color']='blue'
-entry['Status||Content||Status||A||@value']='0'
-entry['Status||Content||Status||A||@dataType']='bool'
-
-entry['Status||Content||Status||B||@class']='SourcePot\\Datapool\\Tools\\MiscTools'
-entry['Status||Content||Status||B||@function']='bool2html'
-entry['Status||Content||Status||B||@yMin']='1'
-entry['Status||Content||Status||B||@yMax']='0'
-entry['Status||Content||Status||B||@color']='blue'
-entry['Status||Content||Status||B||@value']='0'
-entry['Status||Content||Status||B||@dataType']='bool'
-
 entry['Status||Content||Status||timestamp||@tag']='p'
 entry['Status||Content||Status||timestamp||@value']='0'
 entry['Status||Content||Status||timestamp||@dataType']='int'
 
 entry['Status||Content||Status||cpuTemperature||@tag']='p'
-entry['Status||Content||Status||cpuTemperature||@yMin']='30'
-entry['Status||Content||Status||cpuTemperature||@yMax']='100'
 entry['Status||Content||Status||cpuTemperature||@value']='0'
 entry['Status||Content||Status||cpuTemperature||@isSignal']='1'
 entry['Status||Content||Status||cpuTemperature||@dataType']='float'
+
+entry['Status||Content||Status||lat||@tag']='p'
+entry['Status||Content||Status||lat||@value']=GEO['lat']
+entry['Status||Content||Status||lat||@isSignal']='0'
+entry['Status||Content||Status||lat||@dataType']='float'
+
+entry['Status||Content||Status||lon||@tag']='p'
+entry['Status||Content||Status||lon||@value']=GEO['lon']
+entry['Status||Content||Status||lon||@isSignal']='0'
+entry['Status||Content||Status||lon||@dataType']='float'
+
+if bme280Ok==True:
+    entry['Status||Content||Status||temperature_celsius||@tag']='p'
+    entry['Status||Content||Status||temperature_celsius||@yMin']='-10'
+    entry['Status||Content||Status||temperature_celsius||@yMax']='50'
+    entry['Status||Content||Status||temperature_celsius||@value']='0'
+    entry['Status||Content||Status||temperature_celsius||@isSignal']='1'
+    entry['Status||Content||Status||temperature_celsius||@dataType']='float'
+
+    entry['Status||Content||Status||humidity||@tag']='p'
+    entry['Status||Content||Status||humidity||@value']='0'
+    entry['Status||Content||Status||humidity||@isSignal']='1'
+    entry['Status||Content||Status||humidity||@dataType']='float'
+
+    entry['Status||Content||Status||pressure||@tag']='p'
+    entry['Status||Content||Status||pressure||@value']='0'
+    entry['Status||Content||Status||pressure||@isSignal']='1'
+    entry['Status||Content||Status||pressure||@dataType']='float'
 
 entry['Status||Content||Status||Msg||@tag']='p'
 entry['Status||Content||Status||Msg||@value']='Started'
@@ -201,7 +240,6 @@ def setLed(key,value):
             pass
 
 # ===================================== Sensors ===================================
-camera=Picamera2()
 
 def readLeds():
     for key in leds:
@@ -215,11 +253,19 @@ def readInputs():
     setEntry('Status||Content||Status||mode||@value',entry['Settings||Content||Settings||mode||@value'])
     setEntry('Status||Content||Status||captureTime||@value',entry['Settings||Content||Settings||captureTime||@value'])
     setEntry('Status||Content||Status||cpuTemperature||@value',CPUTemperature().temperature)
+    if bme280Ok==True:
+        # Extract temperature, pressure, humidity, and corresponding timestamp
+        data = bme280.sample(bus, I2C_ADDRESS, calibration_params)
+        entry['Status||Content||Status||temperature_celsius||@value']=data.temperature
+        entry['Status||Content||Status||humidity||@value']=data.humidity
+        entry['Status||Content||Status||pressure||@value']=data.pressure    
     return dict(entry)
 
-# ===================================== Behaviour =================================
+if cameraOk==True:
+    camera=Picamera2()
 
 busyCapturing=False
+serverConnectionFailure=False
 
 def capture(filename):
     global busyCapturing
@@ -231,7 +277,7 @@ def capture(filename):
             setLed('Settings||Content||Settings||light||@value',1)
         # Prepare capture entry
         captureEntry=readInputs()
-        if (activateCamera):
+        if (activateCamera and cameraOk==True):
             # set entry lifetime
             if entry['Settings||Content||Settings||mode||@value']=='sms':
                 captureEntry['lifetime']=6048000
@@ -245,7 +291,7 @@ def capture(filename):
             captureEntry['Tag']='media'
             # set camera
             if entry['Settings||Content||Settings||mode||@value']=='video':
-                config=camera.create_video_configuration()
+                config=camera.create_video_configuration(main={"size":(720,480)})
                 camera.configure(config)
                 encoder=H264Encoder(10000000)
                 output=FfmpegOutput(dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_1.mp4',audio=False)
@@ -253,7 +299,7 @@ def capture(filename):
                 time.sleep(5)
                 camera.stop_recording()
             else:
-                config=camera.create_still_configuration(main={"size":(1280,720)})
+                config=camera.create_still_configuration(main={"size":(2592,1944)})
                 camera.configure(config)
                 camera.start(show_preview=False)
                 time.sleep(1)
@@ -268,10 +314,13 @@ def capture(filename):
             # Capture status only
             captureEntry['Tag']='status'
             datapoolclient.add2stack(captureEntry)
+        time.sleep(3)
         busyCapturing=False
     else:
-        print('Too busy, skipped capturing')
+        datapoolclient.addLog({'info':'Too busy, skipped capturing'})
  
+# ===================================== Behaviour =================================
+
 def motionA():
     #print('Motion A')
     if entry['Settings||Content||Settings||mode||@value']=='alarm':
@@ -352,42 +401,52 @@ def mediaItems2stack(captureEntry):
                 captureEntry['Status||Params||File||Extension']='mp4'
                 captureEntry['Status||Params||File||MIME-Type']='video/mp4'    
         else:
-            captureEntry['Status||Params||File||Name']=''
-            captureEntry['Status||Params||File||Extension']=''
-            captureEntry['Status||Params||File||MIME-Type']=''
+            captureEntry['Status||Params||File||Name']='__TODELETE__'
+            captureEntry['Status||Params||File||Extension']='__TODELETE__'
+            captureEntry['Status||Params||File||MIME-Type']='__TODELETE__'
         datapoolclient.add2stack(captureEntry,dirs['media']+'/'+file)
         setEntry('Status||Content||Status||Msg||@value','')
     
 def statusPolling():
     addActivity(-1,'polling')
     addActivityB(-1,'polling')
-    if busyCapturing==False:
+    if busyCapturing==False and serverConnectionFailure==False:
+        # select if activity during status polling should be treated as signal
         setEntry('Status||Content||Status||activity||@isSignal','0')
         setEntry('Status||Content||Status||activityB||@isSignal','1')
         captureEntry=readInputs()
+        # finalize entry
         captureEntry['Tag']='status'
         captureEntry['lifetime']=300
         datapoolclient.add2stack(captureEntry)
+        # reset to stadard if activity should be treated as signal
         setEntry('Status||Content||Status||activity||@isSignal','1')
         setEntry('Status||Content||Status||activityB||@isSignal','1')
-    t=Timer(4.9,statusPolling)
+        t=Timer(7.9,statusPolling)
+    else:
+        t=Timer(21.9,statusPolling)
     t.start()
 statusPolling()
 
 def stackProcessingLoop():
+    global serverConnectionFailure
     answer=datapoolclient.processStack()
     #print(datapoolclient.response)
     #print(answer)
     if type(answer) is bool:
         if answer==True:
             # Stack is empty
+            serverConnectionFailure=False
             t=Timer(1,stackProcessingLoop)
             writeOutputs(datapoolclient.response)
         else:
             # Server answer missing
+            serverConnectionFailure=True
+            datapoolclient.addLog({'error':'Server connection failure, status polling turned off for the time being'})
             t=Timer(30.0,stackProcessingLoop)
     else:
         # Normal stack processing
+        serverConnectionFailure=False
         writeOutputs(datapoolclient.response)
         t=Timer(1.4,stackProcessingLoop)
     t.start()
