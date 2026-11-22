@@ -31,6 +31,20 @@ When sentinel.py runs for the first time, datapoolclient.py will create a set of
 
 These details must match the client registration within the Datapool web application.
 
+The Pi location is loaded from `settings/location.json` at startup. If the file does not exist, sentinel.py creates it with placeholder values. Use this format:
+
+```json
+{
+  "town": "Town",
+  "address": "House and street",
+  "location": "Building",
+  "geo": {
+    "lat": "52.5200",
+    "lon": "13.4050"
+  }
+}
+```
+
 ![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
 ## Remote client registration within Datapool
