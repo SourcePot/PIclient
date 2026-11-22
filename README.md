@@ -31,6 +31,8 @@ When sentinel.py runs for the first time, datapoolclient.py will create a set of
 
 These details must match the client registration within the Datapool web application.
 
+![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
+
 The Pi location is loaded from `settings/location.json` at startup. If the file does not exist, sentinel.py creates it with placeholder values. Use this format:
 
 ```json
@@ -44,8 +46,6 @@ The Pi location is loaded from `settings/location.json` at startup. If the file 
   }
 }
 ```
-
-![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
 ## Remote client registration within Datapool
 You will need to register the new client with one of the Datapool user accounts. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
