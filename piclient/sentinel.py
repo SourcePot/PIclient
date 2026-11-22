@@ -1,14 +1,51 @@
-# Pi location
-TOWN='E.g. enter the town here...'
-ADDRESS='E.g. enter the house o and street here....'
-LOCATION='E.g. enter the building here...'
-
-GEO={'lat':'***','lon':'***'}
-
 import os
+import json
 import time
 from threading import Timer
 import datapoolclient
+
+# Pi location
+DEFAULT_LOCATION={
+    'town':'E.g. enter the town here...',
+    'address':'E.g. enter the house or street here...',
+    'location':'E.g. enter the building here...',
+    'geo':{'lat':'***','lon':'***'}
+}
+
+locationFile=datapoolclient.getDirs()['settings']+'/location.json'
+if not os.path.isfile(locationFile):
+    with open(locationFile,'w',encoding='utf-8') as locationOutput:
+        json.dump(DEFAULT_LOCATION,locationOutput,indent=2)
+
+try:
+    with open(locationFile,'r',encoding='utf-8') as locationInput:
+        locationConfig=json.load(locationInput)
+    if not isinstance(locationConfig,dict):
+        raise ValueError('Location configuration must be a JSON object')
+except (OSError,json.JSONDecodeError,ValueError) as e:
+    datapoolclient.addLog({'error':'Could not load location configuration','exception':repr(e)})
+    locationConfig=DEFAULT_LOCATION
+
+geoConfig=locationConfig.get('geo',{})
+if not isinstance(geoConfig,dict):
+    geoConfig={}
+
+TOWN=locationConfig.get('town')
+ADDRESS=locationConfig.get('address')
+LOCATION=locationConfig.get('location')
+if not isinstance(TOWN,str):
+    TOWN=DEFAULT_LOCATION['town']
+if not isinstance(ADDRESS,str):
+    ADDRESS=DEFAULT_LOCATION['address']
+if not isinstance(LOCATION,str):
+    LOCATION=DEFAULT_LOCATION['location']
+
+lat=geoConfig.get('lat',DEFAULT_LOCATION['geo']['lat'])
+lon=geoConfig.get('lon',DEFAULT_LOCATION['geo']['lon'])
+GEO={
+    'lat':lat if isinstance(lat,(str,int,float)) else DEFAULT_LOCATION['geo']['lat'],
+    'lon':lon if isinstance(lon,(str,int,float)) else DEFAULT_LOCATION['geo']['lon']
+}
 
 # I2C Bus Library, see https://pypi.org/project/smbus2/
 try:
