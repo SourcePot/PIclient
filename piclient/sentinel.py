@@ -232,12 +232,18 @@ def writeOutputs(response):
 def setLed(key,value):
     global leds
     if key in leds:
-        if (int(value)>0):
+        try:
+            isOn = int(value) > 0
+        except (TypeError, ValueError):
+            if isinstance(value,str):
+                isOn=value.strip().lower() in ('1','true','on','yes')
+            else:
+                datapoolclient.addLog({'error':'Invalid LED value','key':key,'value':str(value)})
+                return
+        if isOn:
             leds[key].on()
-            pass
         else:
             leds[key].off()
-            pass
 
 # ===================================== Sensors ===================================
 
@@ -271,51 +277,62 @@ def capture(filename):
     global busyCapturing
     if busyCapturing==False:
         busyCapturing=True
-        activateCamera=entry['Settings||Content||Settings||mode||@value']!='idle'
-        # Activate light
-        if activateCamera and entry['Settings||Content||Settings||mode||@value']!='capture' and entry['Settings||Content||Settings||mode||@value']!='video':
-            setLed('Settings||Content||Settings||light||@value',1)
-        # Prepare capture entry
-        captureEntry=readInputs()
-        if (activateCamera and cameraOk==True):
-            # set entry lifetime
-            if entry['Settings||Content||Settings||mode||@value']=='sms':
-                captureEntry['lifetime']=6048000
-            elif entry['Settings||Content||Settings||mode||@value']=='alarm':
-                captureEntry['lifetime']=31536000
-            elif entry['Settings||Content||Settings||mode||@value']=='video':
-                captureEntry['lifetime']=304800
+        try:
+            activateCamera=entry['Settings||Content||Settings||mode||@value']!='idle'
+            # Activate light
+            if activateCamera and entry['Settings||Content||Settings||mode||@value']!='capture' and entry['Settings||Content||Settings||mode||@value']!='video':
+                setLed('Settings||Content||Settings||light||@value',1)
+            # Prepare capture entry
+            captureEntry=readInputs()
+            if (activateCamera and cameraOk==True):
+                # set entry lifetime
+                if entry['Settings||Content||Settings||mode||@value']=='sms':
+                    captureEntry['lifetime']=6048000
+                elif entry['Settings||Content||Settings||mode||@value']=='alarm':
+                    captureEntry['lifetime']=31536000
+                elif entry['Settings||Content||Settings||mode||@value']=='video':
+                    captureEntry['lifetime']=304800
+                else:
+                    captureEntry['lifetime']=604800
+                # Capture images/video + status
+                captureEntry['Tag']='media'
+                # set camera
+                if entry['Settings||Content||Settings||mode||@value']=='video':
+                    config=camera.create_video_configuration(main={"size":(720,480)})
+                    camera.configure(config)
+                    encoder=H264Encoder(10000000)
+                    videoFile=dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_1.mp4'
+                    output=FfmpegOutput(videoFile,audio=False)
+                    camera.start_recording(encoder,output)
+                    time.sleep(5)
+                    camera.stop_recording()
+                    mediaItems2stack(captureEntry,[videoFile])
+                else:
+                    config=camera.create_still_configuration(main={"size":(2592,1944)})
+                    camera.configure(config)
+                    camera.start(show_preview=False)
+                    time.sleep(1)
+                    firstFile=dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_1.jpg'
+                    camera.capture_file(firstFile)
+                    mediaItems2stack(captureEntry,[firstFile])
+                    time.sleep(1)
+                    secondFile=dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_2.jpg'
+                    camera.capture_file(secondFile)
+                    mediaItems2stack(captureEntry,[secondFile])
             else:
-                captureEntry['lifetime']=604800    
-            # Capture images/video + status
-            captureEntry['Tag']='media'
-            # set camera
-            if entry['Settings||Content||Settings||mode||@value']=='video':
-                config=camera.create_video_configuration(main={"size":(720,480)})
-                camera.configure(config)
-                encoder=H264Encoder(10000000)
-                output=FfmpegOutput(dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_1.mp4',audio=False)
-                camera.start_recording(encoder,output)
-                time.sleep(5)
-                camera.stop_recording()
-            else:
-                config=camera.create_still_configuration(main={"size":(2592,1944)})
-                camera.configure(config)
-                camera.start(show_preview=False)
-                time.sleep(1)
-                camera.capture_file(dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_1.jpg')
-                mediaItems2stack(captureEntry)
-                time.sleep(1)
-                camera.capture_file(dirs['media']+'/'+filename+'_'+str(int(time.time()))+'_2.jpg')
-            # wrap-up
-            camera.stop()
-            mediaItems2stack(captureEntry)
-        else:
-            # Capture status only
-            captureEntry['Tag']='status'
-            datapoolclient.add2stack(captureEntry)
-        time.sleep(3)
-        busyCapturing=False
+                # Capture status only
+                captureEntry['Tag']='status'
+                datapoolclient.add2stack(captureEntry)
+        except Exception as e:
+            datapoolclient.addLog({'error':'Capture failed','exception':repr(e)})
+        finally:
+            if cameraOk==True:
+                try:
+                    camera.stop()
+                except Exception as e:
+                    datapoolclient.addLog({'error':'Camera stop failed','exception':repr(e)})
+            time.sleep(3)
+            busyCapturing=False
     else:
         datapoolclient.addLog({'info':'Too busy, skipped capturing'})
  
@@ -384,27 +401,32 @@ def addActivityB(add,label):
         activityB=0
     setEntry('Status||Content||Status||activityB||@value',activityB)
     setEntry('Status||Content||Status||activityB||@label',label)
-    setEntry('Status||Content||Status||activity||@color','#03f')
+    setEntry('Status||Content||Status||activityB||@color','#03f')
 
 # ==== add media item and/or status data to stack and process the stack ===========
 
-def mediaItems2stack(captureEntry):
-    for file in os.listdir(dirs['media']):
+def mediaItems2stack(captureEntry,mediaFiles):
+    for filePath in mediaFiles:
+        if not os.path.isfile(filePath):
+            datapoolclient.addLog({'warning':'Captured media file missing','file':filePath})
+            continue
+        file=os.path.basename(filePath)
         fileNameComps=file.split('_')
-        if (len(fileNameComps)==3):
-            captureEntry['Status||Content||Status||timestamp||@value']=fileNameComps[1]
-            captureEntry['Status||Params||File||Name']=file
-            if "jpg" in file:
-                captureEntry['Status||Params||File||Extension']='jpg'
-                captureEntry['Status||Params||File||MIME-Type']='image/jpeg'
-            elif "mp4" in file:
-                captureEntry['Status||Params||File||Extension']='mp4'
-                captureEntry['Status||Params||File||MIME-Type']='video/mp4'    
+        if len(fileNameComps)!=3:
+            datapoolclient.addLog({'warning':'Unexpected media filename','file':file})
+            continue
+        captureEntry['Status||Content||Status||timestamp||@value']=fileNameComps[1]
+        captureEntry['Status||Params||File||Name']=file
+        if file.lower().endswith('.jpg'):
+            captureEntry['Status||Params||File||Extension']='jpg'
+            captureEntry['Status||Params||File||MIME-Type']='image/jpeg'
+        elif file.lower().endswith('.mp4'):
+            captureEntry['Status||Params||File||Extension']='mp4'
+            captureEntry['Status||Params||File||MIME-Type']='video/mp4'
         else:
-            captureEntry['Status||Params||File||Name']='__TODELETE__'
-            captureEntry['Status||Params||File||Extension']='__TODELETE__'
-            captureEntry['Status||Params||File||MIME-Type']='__TODELETE__'
-        datapoolclient.add2stack(captureEntry,dirs['media']+'/'+file)
+            datapoolclient.addLog({'warning':'Unsupported media extension','file':file})
+            continue
+        datapoolclient.add2stack(captureEntry,filePath)
         setEntry('Status||Content||Status||Msg||@value','')
     
 def statusPolling():
@@ -456,12 +478,16 @@ stackProcessingLoop()
 ticks=0
 def periodicCapture():
     global ticks
-    captureTime=int(entry['Settings||Content||Settings||captureTime||@value'])
+    try:
+        captureTime=int(entry['Settings||Content||Settings||captureTime||@value'])
+    except (TypeError, ValueError):
+        datapoolclient.addLog({'error':'Invalid captureTime value','value':str(entry['Settings||Content||Settings||captureTime||@value'])})
+        captureTime=0
     if (captureTime!=0):
+        ticks+=1
         if (ticks % captureTime==0 and entry['Settings||Content||Settings||mode||@value']!='idle'):
             addActivity(0,'capture')
             capture('capture')
-    ticks+=1
     t=Timer(1.0,periodicCapture)
     t.start()
 periodicCapture()
