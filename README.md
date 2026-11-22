@@ -1,10 +1,10 @@
 # Raspberry Pi Client
-The Python code of this repository is for a Raspberry Pi. It enables the Raspberry Pi to connect to the Datapool web application.
-It connects to the web application via the Datapool processor `SourcePot\Datapool\Processing\RemoteClient` and it can be used within any data app.
+The Python code in this repository runs on a Raspberry Pi and enables the Pi to connect to the Datapool web application.
+It connects through the Datapool processor `SourcePot\Datapool\Processing\RemoteClient` and can be used with any data app.
 
-The typical application is a motion sensor triggered camera. 
+A typical use case is a motion-triggered camera.
 
-Here are a few examples, first Mr. Fox and second myself:
+Examples include the following photograph of Mr. Fox and an image from a repair and cleaning session:
 
 ![Raspberry Pi Client Mr Fox shot](/assets/img/mr_fox.jpg "Mr Fox")
 
@@ -12,28 +12,31 @@ Here are a few examples, first Mr. Fox and second myself:
 
 ## How does it work?
 
-The class `SourcePot\Datapool\Foundation\ClientAccess`, method `request` receives requests from e.g. multiple Raspberry Pis. These requests are facilitated by regularly calling up the website `../resource.php`. The further processing of these requests require the client to be registered with a Datapool user account. If the registered scope is `SourcePot\Datapool\Processing\RemoteClient` and the method is set to `clientCall`, the class `RemoteClient` will receive the requests containing data (status information, sensory data) and/or files (images, videos) e.g. of a Raspberry Pi. The web application's answer to each request contains the settings for the respective Raspberry Pi.
+The `request` method of `SourcePot\Datapool\Foundation\ClientAccess` receives requests from multiple Raspberry Pis. The clients send these requests by regularly calling `../resource.php`. Each request can then be processed only when the client is registered with a Datapool user account.
+
+If the registered scope is `SourcePot\Datapool\Processing\RemoteClient` and the method is set to `clientCall`, the `RemoteClient` class receives requests containing status information, sensor data, and/or files such as images and videos. The web application returns the corresponding settings for each Raspberry Pi in response.
 
 ## First steps on the side of the Raspberry Pi
-To setup the Raspberry Pi client you need to create a folder on your Raspberry Pi and copy the following three python files into this folder: 
-1. \_\_init\_\_.py,
-2. datapoolclient.py and 
+To set up the Raspberry Pi client, create a folder on the Raspberry Pi and copy the following three Python files into it:
+
+1. \_\_init\_\_.py
+2. datapoolclient.py
 3. sentinel.py
 
-You will need to adjust the url in datapoolclient.py to the web address of __your__ Datapool web application:
+In `datapoolclient.py`, set the URL to the address of **your** Datapool web application:
 ![URL setting within datapoolclient.py](/assets/img/url.png "URL setting within datapoolclient.py")
-Alternatively, the address of the website can be specified in the file `client.json` mentioned later.
+Alternatively, specify the web application address in the `client.json` file described below.
 
-When sentinel.py runs for the first time, datapoolclient.py will create a set of sub-directories. You will need to adjust the client.json file in the newly created settings sub-directory.
+When `sentinel.py` runs for the first time, `datapoolclient.py` creates a set of subdirectories. Update the `client.json` file in the newly created `settings` subdirectory.
 
 > [!IMPORTANT]  
-> The `settings/client.json` file contains the access details, such as the Datapool web application url, the client_id and client_secret.
+> The `settings/client.json` file contains access details such as the Datapool web application URL, `client_id`, and `client_secret`.
 
 These details must match the client registration within the Datapool web application.
 
 ![Update client.json with the correct client_id and client_secret](/assets/img/client-json.png "Content of client.json")
 
-The Pi location is loaded from `settings/location.json` at startup. If the file does not exist, sentinel.py creates it with placeholder values. Use this format:
+The Pi location is loaded from `settings/location.json` at startup. If the file does not exist, `sentinel.py` creates it with placeholder values. Use the following format:
 
 ```json
 {
@@ -48,36 +51,38 @@ The Pi location is loaded from `settings/location.json` at startup. If the file 
 ```
 
 ## Remote client registration within Datapool
-You will need to register the new client with one of the Datapool user accounts. To do this, go to 'Admin' &rarr; 'Account' and expand 'App credentials' (Lock symbol).
-Remember the registered client will have the same privileges as the user of this account but limited to the selected scope. The scope for the Raspberry Pi client must be class `SourcePot\Datapool\Processing\RemoteClient` and the method `clientCall`. The method clientCall of class SourcePot\Datapool\Processing\RemoteClient will handle the client requests.
+Register the new client with a Datapool user account. To do this, open **Admin** &rarr; **Account** and expand **App credentials** (lock symbol).
+
+The registered client has the same privileges as the associated user, but only within the selected scope. For the Raspberry Pi client, set the scope to `SourcePot\Datapool\Processing\RemoteClient` and the method to `clientCall`. The `clientCall` method of `SourcePot\Datapool\Processing\RemoteClient` handles requests from the client.
 
 The following screenshot shows the registration of the client in row 0001:
 
 ![Raspberry Pi client registration](/assets/img/datapool_client_registration.png "Client registration within the Datapool web application")
 
-Multiple Raspberry Pis can run as clients with the same `client_id`. The Raspberry Pis are are distinguished by their location and the location of a Raspberry Pi is set by `entry={'Group':'Town','Folder':'Address','Name':'Location'}` in `sentinel.py`. Just replace Town, Address and Location with the correct values. 
+Multiple Raspberry Pis can use the same `client_id` as clients. They are distinguished by their locations, which are configured in `sentinel.py` with `entry={'Group':'Town','Folder':'Address','Name':'Location'}`. Replace `Town`, `Address`, and `Location` with the appropriate values.
 
-When a Raspberry Pi connects for the very first time to the Datapool host a database entry is created based on Town, Address and Location in the Datapool database table `remoteclient`. The entry's EntryId is `{baseEntryId}_definition` and contains the html widget template definitions for status and settings. These are provided by the Raspberry Pi, i.e. the Raspberry Pi's Python script defines the user interface within the Datapool web application. The settings, that control the Raspberry Pi, will be stored in the same table as entry with an EntryId="..._setting". The latest data provided by the Raspberry Pi is saved as entry in the same table with the EntryId=`{baseEntryId}_lastentry`.
+When a Raspberry Pi connects to the Datapool host for the first time, Datapool creates a database entry in the `remoteclient` table based on `Town`, `Address`, and `Location`. The entry's `EntryId` is `{baseEntryId}_definition` and contains the HTML widget templates for status and settings. These templates are supplied by the Raspberry Pi: the Pi's Python script defines the user interface in the Datapool web application. Settings that control the Raspberry Pi are stored in the same table in an entry whose `EntryId` is `"..._setting"`. The most recent data supplied by the Raspberry Pi is stored in another entry with `EntryId={baseEntryId}_lastentry`.
 
 ![Client host communication](/assets/img/client-host-communication.png "Client host communication")
 
-Initially the client needs to request a new access token. Aften having received the access token, the client can send client (status) data such as measurements, senosor data and optionally media files such as images or movies (POST request). The Datapool host answers the host request with new settings data for the client.
+Initially, the client requests a new access token. Once it has the token, the client can send status data such as measurements and sensor readings, as well as optional media files such as images or videos in a POST request. The Datapool host responds with updated settings for the client.
 
 ## Example view of the Datapool web application
-The RemoteClient processor provides an user interface which is actually defined by the Python code of the remote client itself. Within the `sentinel.py` file the Python dictionary `entry`, key `Content||Settings||...` defines the control elements and `entry` key `Content||Status||...` the status elements (display). This allows each remote client to provide different functionalities and to specify its' specific control elements (buttons, drop-down menus, slider etc.) for the Datapool web application.
+The `RemoteClient` processor provides a user interface defined by the remote client's Python code. In `sentinel.py`, the `Content||Settings||...` key of the `entry` dictionary defines control elements, while `Content||Status||...` defines status elements. This allows each remote client to provide different features and specify its own controls, such as buttons, drop-down menus, and sliders.
 
 ![Raspberry Pi client registration](/assets/img/remote-client.png "User Interface on a data app")
 
-# Automatic start of the Pi Client on a Raspberry Pi
-In this example, the operating system of the Raspberry Pi is Debian Trixie. The directory containing the Python files of the Pi client is `/home/carsten/Pi/`.
-First, a new service for `systemd` is created, which executes the file `sentinel.py` every time the system boots, which then runs in an infinite loop.
+# Automatic startup of the Pi Client on a Raspberry Pi
+This example uses Debian Trixie on the Raspberry Pi and assumes that the Pi client Python files are in `/home/carsten/Pi/`.
+
+First, create a `systemd` service that executes `sentinel.py` every time the system boots. The script then runs in an infinite loop.
 
 ```
 sudo -i
 cd /etc/systemd/system/
 nano pi.service
 ```
-The last command opens a new file `pi.service` in the editor, to which the following content is now added:
+The last command opens `pi.service` in the editor. Add the following configuration:
 
 ```
 [Unit]
@@ -93,19 +98,19 @@ User=carsten
 [Install]
 WantedBy=multi-user.target
 ```
-The following commands are used to adjust the access rights:
+Use the following commands to set the file permissions:
 
 ```
 sudo chmod 744 /home/carsten/Pi/sentinel.py
 sudo chmod 664 /etc/systemd/system/pi.service
 ```
-Finally, the new service `pi.service` must be activated:
+Finally, reload `systemd` and enable the new `pi.service`:
 
 ```
 sudo systemctl daemon-reload
 sudo systemctl enable pi.service
 ```
-The next time the system starts up, `pi.service` will be executed and this will start the Python script `sentinel.py`. To test whether the service was executed correctly or whether there were any errors, the status can be checked as follows:
+After the next system startup, `pi.service` starts the `sentinel.py` Python script. To check whether the service started correctly or encountered errors, run:
 
 ```
 sudo systemctl status pi.service
